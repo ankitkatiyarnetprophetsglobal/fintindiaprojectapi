@@ -1,0 +1,314 @@
+          if (ds_AllData.Tables[2].Rows.Count > 0)
+            {
+                html += "<div class='row clearfix' style='margin-top:30px;'>";
+                html += "<div class='overall-fitess'>";
+                html += "<div class='wrapper-box bg2'>";
+
+                for (int i = 0; i < ds_AllData.Tables[2].Rows.Count; i++)
+                {
+                    string TestCategory = "";
+                    string IndividualFeedBack = "";
+                    string IndividualLevelFeedback = "";
+                    string FCurrentScore = "";
+                    string FScoreUnit = "";
+                    string Score = (Convert.ToInt32(ds_AllData.Tables[2].Rows[i]["Percentile"])).ToString();
+
+                    if (ds_AllData.Tables[2].Rows.Count > 0)
+                    {
+                        if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) == 0)
+                        {
+                            IndividualTestGraphClr = "#ff043f;";
+                            IndividualScorelblClr = "#ff043f;";
+                            IndividualBarWidth = "0%";
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label30;
+                            ScoreWidth = "width:128px; display:block; text-align:left;";
+
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 20)
+                        {
+                            IndividualTestGraphClr = "#ff043f;";
+                            IndividualScorelblClr = "#ff043f;";
+                            IndividualBarWidth = "2%";
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label30;
+                            ScoreWidth = "width:128px; display:block; text-align:left;";
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 20 && Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 40)
+                        {
+                            IndividualTestGraphClr = "#fc6ba9;";
+                            IndividualScorelblClr = "#fc6ba9;";
+                            IndividualBarWidth = "16%";
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label31;
+                            ScoreWidth = "width:128px; display:block; text-align:left;";
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 40 && Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 60)
+                        {
+                            IndividualTestGraphClr = "#ffaa62;";
+                            IndividualScorelblClr = "#ffaa62;";
+                            IndividualBarWidth = "29%";
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label32;
+                            ScoreWidth = "";
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 60 && Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 70)
+                        {
+                            IndividualTestGraphClr = "#f7d54e;";
+                            IndividualScorelblClr = "#f7d54e;";
+                            IndividualBarWidth = "43%";
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label33;
+                            ScoreWidth = "";
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 70 && Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 80)
+                        {
+                            IndividualTestGraphClr = "#8bd470;";
+                            IndividualScorelblClr = "#8bd470;";
+                            IndividualBarWidth = "57%";
+                            IndividualFeedBack = Resources.ResourceUserDashboard.label37;
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label34;
+                            ScoreWidth = "";
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 80 && Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 90)
+                        {
+                            IndividualTestGraphClr = "#00b289;";
+                            IndividualScorelblClr = "#00b289;";
+                            IndividualBarWidth = "70%";
+                            IndividualFeedBack = Resources.ResourceUserDashboard.label38;
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label35;
+                            ScoreWidth = "width:100%; display:block; text-align:right;";
+                        }
+                        else if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 90)
+                        {
+                            IndividualTestGraphClr = "#009bdf;";
+                            IndividualScorelblClr = "#009bdf;";
+                            IndividualBarWidth = "84%";
+                            IndividualFeedBack = Resources.ResourceUserDashboard.label39;
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label36;
+                            ScoreWidth = "width:100%; display:block; text-align:right;";
+                        }
+                        if (Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Percentile"]) >= 99.99)
+                        {
+                            Score = "100";
+                            IndividualTestGraphClr = "#009bdf;";
+                            IndividualScorelblClr = "#009bdf;";
+                            IndividualBarWidth = "100%";
+                            IndividualFeedBack = Resources.ResourceUserDashboard.label39;
+                            IndividualLevelFeedback = Resources.ResourceUserDashboard.label36;
+                            ScoreWidth = "width:100%; display:block; text-align:right;";
+                        }
+
+                        if (IndividualFeedBack == "")
+                        {
+                            if (Convert.ToInt32(Session["AgeGroupId"]) <= 2)
+                            {
+                                if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Balance")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label40;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Agility")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label41;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Coordination")
+                                {
+                                    IndividualFeedBack = GetGlobalResourceObject("ResourceUserDashboard", "label73").ToString();
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Cardiovascular Endurance")
+                                {
+                                    IndividualFeedBack = GetGlobalResourceObject("ResourceUserDashboard", "label74").ToString();
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Speed")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label42;
+                                }
+
+
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Flexibility")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label43;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Strength")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label44;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Power")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label45;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Muscular Endurance")
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.label93;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["CategoryOrginal"].ToString() == "Muscular Endurance")
+                                {
+                                    IndividualFeedBack = "To improve Abdominal Strength (partial curl ups) and Muscular Endurance (push-ups/ modified push-ups for Female) 1. You need to Practice climb stairs, hill walk, cycling, dance, push-ups, sit ups, squats, planks, crunches, Naukasana, Shalabhasana, Akarna Dhanurasana etc. to build strength. 2. You need to practice Tadasana, Vrikshasana, Utkatasana, Trikonasana, Katichakrasana, Yoga Mudrasana, Quarter squat, Climb stairs, Crunches and Back extension exercise.";
+                                }
+                                else
+                                {
+                                    IndividualFeedBack = "";
+                                }
+                            }
+                            else if (Convert.ToInt32(Session["AgeGroupId"]) >= 3)
+                            {
+                                if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "60") // Flamingo Balance Test
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3Flamingo;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1001") // Vrikshasana (Tree Pose)
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3vrikshana;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "55") // Partial Curl Up - 30 seconds
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3Partial30Sec;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1002") // Naukasana (Boat Pose)
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3Naukasana;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "57") // Push ups (Male)/Modified Push ups (Female)
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3Pushups;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1003") // 2 km Run/Walk
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp32Kmrun;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1004") // V-Sit Reach Test
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3VSitReach;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1005") // Chair Stand Test 
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3ChairStand;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1006") // Chair Sit and Reach Test
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3ChairSit_Reach;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1007") // 8 Foot Up-and-Go Test
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp38FtGo;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1008") // 2-Minute Step Test
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp32minuteStep;
+                                }
+                                else if (ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() == "1009") // Back Scratch Test
+                                {
+                                    IndividualFeedBack = Resources.ResourceUserDashboard.AGrp3BackStretch;
+                                }
+                            }
+                        }
+                        if (ds_AllData.Tables[2].Rows[i]["Category"].ToString() == "label51" && ds_AllData.Tables[2].Rows[i]["TestType"].ToString() == "label56")
+                        {
+                            TestCategory = "label65";
+                        }
+                        else if (ds_AllData.Tables[2].Rows[i]["Category"].ToString() == "label51" && ds_AllData.Tables[2].Rows[i]["TestType"].ToString() == "label57")
+                        {
+                            TestCategory = "label52";
+                        }
+                        else
+                        {
+                            TestCategory = ds_AllData.Tables[2].Rows[i]["Category"].ToString();
+                        }
+
+                        if (!string.IsNullOrEmpty(ds_AllData.Tables[2].Rows[i]["Score"].ToString()))
+                        {
+                            int CurrentScore = Convert.ToInt32(ds_AllData.Tables[2].Rows[i]["Score"]);
+                            string CurrentScoreUnit = ds_AllData.Tables[2].Rows[i]["Score_Unit"].ToString();
+
+                            if (CurrentScoreUnit == "mm")
+                            {
+                                FCurrentScore = RatingScores.HeightConvertern(Convert.ToDouble(ds_AllData.Tables[2].Rows[i]["Score"])) + " " + GetGlobalResourceObject("ResourceTakeTest", "label8").ToString() + "";
+                                FScoreUnit = GetGlobalResourceObject("ResourceTakeTest", "label8").ToString();
+                            }
+                            if (CurrentScoreUnit == "msec")
+                            {
+                                FCurrentScore = Showresult(ds_AllData.Tables[2].Rows[i]["Score"].ToString());
+                                FScoreUnit = GetGlobalResourceObject("ResourceTakeTest", "label11").ToString();
+                            }
+                            if (CurrentScoreUnit == "number")
+                            {
+                                FCurrentScore = ds_AllData.Tables[2].Rows[i]["Score"].ToString() + " " + GetGlobalResourceObject("ResourceTakeTest", "label129").ToString() + "";
+                                FScoreUnit = GetGlobalResourceObject("ResourceTakeTest", "label129").ToString();
+                            }
+                        }
+                    }
+                    
+                    html += "<div class='col-xs-12 col-sm-12 col-md-4  border-box-right border-box-bottom'>";
+                    html += "<div class='info-box'>";
+
+                    html += "<div class='info-head-caption'>";
+                    html += "<div class='info-box-content'>";
+                    //html += "<span class='img-icon'><img src='" + ds_AllData.Tables[2].Rows[i]["TestImage"].ToString() + "' class=''></span>";
+                    html += "<span class='img-icon'><a href='javascript:void(0);' id='test' onclick='SuggestionVideoPopUp(" + ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() + ")'><img src='" + ds_AllData.Tables[2].Rows[i]["TestImage"].ToString() + "' class=''></a></span>";
+                    html += "<span class='info-box-text'>" + GetGlobalResourceObject("ResourceUserDashboard", TestCategory).ToString() + "</span>";                    
+                    html += "<span class='info-box-number'>" + GetGlobalResourceObject("ResourceUserDashboard", ds_AllData.Tables[2].Rows[i]["TestType"].ToString()).ToString() + "</span>";
+                    html += "</div>";
+                   
+                    html += "<div class='percentage-box'>";
+                    html += "<span class='label-text-a increase-percentage' style='background: " + IndividualScorelblClr + "'>" + Math.Round(Convert.ToDecimal(Score)) + " " + GetGlobalResourceObject("ResourceHome", "label46").ToString() + "</span>";
+                    html += "<small class='text-color-cdb small-caption'>" + IndividualLevelFeedback + "</small>";                   
+                    html += "</div>";
+                    html += "</div>";
+
+                    html += "<div class='progress-group'>";
+
+                    if (Convert.ToInt32(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 20)
+                    {
+                        html += "<div class='progress-bar-less-20-perc' style='width:" + IndividualBarWidth + ";'>";
+                    }
+                    else
+                    {
+                        html += "<div class='progress-bar' style='width:" + IndividualBarWidth + ";'>";
+                    }
+
+                    //html += "<div class='progress-score'><span>" + FCurrentScore + "</span></div>";
+                    //html += "<div class='pointer-position'><img src='images/pointer.png'></div>";
+                    //html += "<div class='progress-unit'><span>" + FScoreUnit + "</span></div>";
+
+                    html += "<div class='progress-score'><span></span></div>";
+                    html += "<div class='pointer-position'><img src='images/pointer.png'></div>";
+                    html += "<div class='progress-unit'><span style='" + ScoreWidth + "'>" + FCurrentScore + "</span></div>";
+
+                    html += "</div>";
+                    html += "<div class='progress-gray-bg'>";
+                    html += "<div class='endurance-bg-orange progress-endurance' style='background:" + IndividualTestGraphClr + "; width:" + IndividualBarWidth + ";'></div>";
+                    html += "</div>";
+                    html += "</div>";
+
+                    html += "<div class='text-content'>";
+                    //html += "<h5>Ultimate Goal (L7) :2.44.83 sec</h5>";
+                    if(Convert.ToInt32(ds_AllData.Tables[2].Rows[i]["Percentile"]) < 90)
+                    {
+                        html += "<div class='suggestionvideodiv' onclick='SuggestionVideoPopUp(" + ds_AllData.Tables[2].Rows[i]["TestTypeId"].ToString() + ")'>";
+                        html +=  GetGlobalResourceObject("ResourceUserDashboard", "lblsuggheadg").ToString() + "</br>";
+                        html += "<span class='suggestionVideo'><a href='javascript:void(0);' id='test'><img src='Images/test_play.png' class='demo-test'></a>" + "</span>";                       
+                        html += "</div>";
+                    }
+                    
+                    //html += "<p>";
+                    html += "<p>" + IndividualFeedBack + " ";
+                    html += "<a href='#a' onclick='ViewTestHistory(" + i + ")'> " + GetGlobalResourceObject("ResourceUserDashboard", "label53").ToString() + " <i class='fa fa-arrow-circle-o-right'></i> </a>";
+                    html += "</p>";
+                    html += "</div>";
+
+                    html += "</div>";
+                    html += "</div>";
+
+                    html += "<input type='hidden' runat='server' id='hidTestTypeId" + i + "' value='" + ds_AllData.Tables[2].Rows[i]["TestTypeId"] + "'/>";
+
+                }
+
+                html += "</div>";
+                html += "</div>";
+                html += "</div>";
+            }
+
+
+            html += "</div>";
+            html += "</section>";
+            html += "</div>";
+
+
+            dvTestBoard.InnerHtml = html;
+
+        }
