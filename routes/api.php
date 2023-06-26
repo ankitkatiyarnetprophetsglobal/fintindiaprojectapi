@@ -270,7 +270,17 @@ Route::prefix('v2')->group(function(){
 	Route::post('encryt_dumy', [App\Http\Controllers\v2\ItDivController::class, 'encryptFunct']);
 	Route::post('decrypt_dumy', [App\Http\Controllers\v2\ItDivController::class, 'decryptFunct']);
 	
+	// GroupChallenges api
 	
+	Route::get('getactivities',[App\Http\Controllers\v2\ChallengesController::class,'getactivities']);
+	Route::post('userdetailsactivities',[App\Http\Controllers\v2\ChallengesController::class,'userdetailsactivities']);
+	Route::post('getuserhistorylist',[App\Http\Controllers\v2\ChallengesController::class,'getuserhistorylist']);
+	Route::post('userhistorysactivities',[App\Http\Controllers\v2\ChallengesController::class,'userhistorysactivities']);
+	Route::post('userparticularactivities',[App\Http\Controllers\v2\ChallengesController::class,'userparticularactivities']);
+	Route::get('groupactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'groupactivitiestraking']);
+
+
+	Route::get('testingvalue',[App\Http\Controllers\v2\ChallengesController::class,'testingvalue']);
 	
 	
 });

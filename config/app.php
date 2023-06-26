@@ -244,6 +244,7 @@ return [
 		'PDF' => Barryvdh\DomPDF\Facade::class,
 		'Captcha' => Mews\Captcha\Facades\Captcha::class,
         'Image' => 'Intervention\Image\Facades\Image',
+        'Helper' => App\Helpers\Helper::class,
 		//'MailTemplate' => Juanparati\Sendinblue\Facades\Template::class,
 		//'SMS' => Juanparati\Sendinblue\Facades\SMS::class,        		
     ], 
