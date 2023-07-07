@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Userhistorytraking extends Model
 {
-    
+    use SoftDeletes;
 	use HasFactory;
 	protected $table ='userhistorytrakings';
 	public $timestamps = false;
@@ -17,6 +18,8 @@ class Userhistorytraking extends Model
 		'groupid',
 		'modegroupid',
 		'trip_id',
+		'trip_name',
+		'commemt',
 		'average_speed',
 		'max_speed',
 		'steps',

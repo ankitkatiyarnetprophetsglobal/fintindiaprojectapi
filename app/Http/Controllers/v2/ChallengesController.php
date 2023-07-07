@@ -233,13 +233,13 @@ class ChallengesController extends Controller
             
         } catch (Exception $e) {
             
-            $function_name = 'userdetailsactivities';   
-            $controller_name = 'ChallengesController';
+            // $function_name = 'userdetailsactivities';   
+            // $controller_name = 'ChallengesController';
             $error_code = '901';
             $error_message = $e->getMessage();
-            $send_payload = null;
-            $response = null;            
-            $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             return Response::json(array(
                 'isSuccess' => 'false',
@@ -268,7 +268,7 @@ class ChallengesController extends Controller
                 return Response::json(array(
                     'isSuccess' => 'true',
                     'code'      => $error_code,
-                    'data'      => $datajson,
+                    'data'      => $data,
                     'message'   => $error_message
                 ), 200);
             }else{
@@ -287,13 +287,13 @@ class ChallengesController extends Controller
             
         } catch (Exception $e) {
             
-            $function_name = 'getactivities';   
-            $controller_name = 'ChallengesController';
+            // $function_name = 'getactivities';   
+            // $controller_name = 'ChallengesController';
             $error_code = '901';
             $error_message = $e->getMessage();
-            $send_payload = null;
-            $response = null;            
-            $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -314,7 +314,9 @@ class ChallengesController extends Controller
             $user_id = is_int($request->user_id);
             // $groupid = is_int($request->groupid);
             $modegroupid = is_int($request->modegroupid);
-            $trip_id = is_int($request->trip_id);
+            $trip_id = is_int($request->trip_id);            
+            $trip_name = $request->trip_name;            
+            $commemt = $request->commemt;            
             $average_speed = is_int($request->average_speed);
             $max_speed = $request->max_speed;
             $steps = $request->steps;
@@ -323,6 +325,7 @@ class ChallengesController extends Controller
             $uom = $request->uom;            
             $date = strtotime($request->datetime);              
             $date_value = date('Y-m-d h:i:s ',$date);
+
 
             $validator = Validator::make($request->all(), [                 
 
@@ -405,6 +408,19 @@ class ChallengesController extends Controller
                 
                 $error_code = '801';
                 $error_message = 'Required Average Speed';                
+                
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => null,
+                    'message'   => $error_message
+                ), 200);    
+            }
+            
+            if($trip_name == null || $trip_name == '' || $trip_name === false){
+                
+                $error_code = '801';
+                $error_message = 'Required Trip Name';                
                 
                 return Response::json(array(
                     'isSuccess' => 'false',
@@ -510,6 +526,8 @@ class ChallengesController extends Controller
             $Userdetailsactitrak->groupid = $request->groupid;
             $Userdetailsactitrak->modegroupid = $request->modegroupid;
             $Userdetailsactitrak->trip_id = $request->trip_id;
+            $Userdetailsactitrak->trip_name = $request->trip_name;
+            $Userdetailsactitrak->commemt = $request->commemt;
             $Userdetailsactitrak->average_speed = $request->average_speed;
             $Userdetailsactitrak->max_speed = $request->max_speed;
             $Userdetailsactitrak->steps = $request->steps;
@@ -530,13 +548,13 @@ class ChallengesController extends Controller
 
         } catch (Exception $e) {
             
-            $function_name = 'getactivities';   
-            $controller_name = 'ChallengesController';
+            // $function_name = 'getactivities';   
+            // $controller_name = 'ChallengesController';
             $error_code = '901';
             $error_message = $e->getMessage();
-            $send_payload = null;
-            $response = null;            
-            $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -568,11 +586,12 @@ class ChallengesController extends Controller
             }
 
             $data = Userhistorytraking::with(['getMasterGroupDetails'])->where('status', 1)->where('user_id', '=', $request->user_id)->get();    
+            
             if(count($data) > 0){        
                 $error_code = 200;
                 $error_message = null;
                 return Response::json(array(
-                    'isSuccess' => 'false',
+                    'isSuccess' => 'true',
                     'code'      => $error_code,
                     'data'      => $data,
                     'message'   => $error_message
@@ -595,13 +614,13 @@ class ChallengesController extends Controller
 
         } catch (Exception $e) {
             
-            $function_name = 'getactivities';   
-            $controller_name = 'getuserhistorylist';
+            // $function_name = 'getactivities';   
+            // $controller_name = 'getuserhistorylist';
             $error_code = '901';
             $error_message = $e->getMessage();
-            $send_payload = null;
-            $response = null;            
-            $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -620,7 +639,8 @@ class ChallengesController extends Controller
         try{   
 
             $data = $request->all(); 
-            $json_validater = Helper::json_validator($data);
+            // $json_validater = Helper::json_validator($data);
+            $json_validater = $this->json_validator($data);
 
             if($json_validater === true){
 
@@ -699,13 +719,13 @@ class ChallengesController extends Controller
 
         } catch (Exception $e) {
             
-            $function_name = 'userparticularactivities';   
-            $controller_name = 'ChallengesController';
+            // $function_name = 'userparticularactivities';   
+            // $controller_name = 'ChallengesController';
             $error_code = '901';
             $error_message = $e->getMessage();
-            $send_payload = null;
-            $response = null;            
-            $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -785,13 +805,13 @@ class ChallengesController extends Controller
 
         }catch(Exception $e){
 
-            $function_name = 'userparticularactivities';   
-            $controller_name = 'groupactivitiestraking';
+            // $function_name = 'userparticularactivities';   
+            // $controller_name = 'groupactivitiestraking';
             $error_code = '901';
             $error_message = $e->getMessage();
-            $send_payload = null;
-            $response = null;            
-            $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -812,6 +832,140 @@ class ChallengesController extends Controller
         echo date('m/d/y h:i:s', $time);
         dd(date('m/d/y h:i:s', $time));
 
+    }
+
+    public static function json_validator($data) {
+
+        try{            
+            if (!empty($data)) {
+                
+                return is_array($data) ? true : false;
+            }else{
+                
+                return false;
+            }
+        
+        }catch(Exception $e){
+
+            $e->getMessage();
+        }    
+    }
+
+    public function deletedactivitiestraking(Request $request){
+        // dd($request->deleted_id);
+        try{
+
+            $user_id = is_int($request->user_id);
+            $trip_id = is_int($request->trip_id);
+
+            if($user_id == null || $user_id == '' || $user_id === false){
+                
+                $error_code = '801';
+                $error_message = 'Required Deleted Id';                
+                
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => null,
+                    'message'   => $error_message
+                ), 200);    
+            }
+            
+            if($trip_id == null || $trip_id == '' || $trip_id === false){
+                
+                $error_code = '801';
+                $error_message = 'Required Trip Id';                
+                
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => null,
+                    'message'   => $error_message
+                ), 200);    
+            }
+            
+            $datadetailsactivitiestrakings = Userdetailsactivitiestrakings::where('status', 1)->where('user_id',$request->user_id)->where('trip_id',$request->trip_id)->get();   
+    
+            if(count($datadetailsactivitiestrakings) > 0){  
+                      
+                foreach($datadetailsactivitiestrakings as $key => $value){
+
+                    $deletactivities = Userdetailsactivitiestrakings::where('user_id', $value['user_id'])->where('trip_id', $value['trip_id'])->update(['status' => 0]);
+                }
+
+                // $error_code = 200;
+                // $error_message = null;
+                // $data = "Successfully Deleted Records";
+
+                // return Response::json(array(
+                //     'isSuccess' => 'true',
+                //     'code'      => $error_code,
+                //     'data'      => $data,
+                //     'message'   => $error_message
+                // ), 200);
+
+                $deletedhistorytraking = Userhistorytraking::where('user_id', $request->user_id)->where('trip_id', $value['trip_id'])->update(['status' => 0]);                
+                // dd($deletedhistorytraking);
+                if($deletedhistorytraking > 0){        
+                    $error_code = 200;
+                    $error_message = null;
+                    $data = "Successfully Deleted Records";
+
+                    return Response::json(array(
+                        'isSuccess' => 'true',
+                        'code'      => $error_code,
+                        'data'      => $data,
+                        'message'   => $error_message
+                    ), 200);
+
+                }else{
+
+                    $error_code = 200;
+                    $error_message = "Somthing Went Wrong";
+                    $data = null;
+
+                    return Response::json(array(
+                        'isSuccess' => 'false',
+                        'code'      => $error_code,
+                        'data'      => $data,
+                        'message'   => $error_message
+                    ), 200);
+                }
+
+            }else{
+
+                $error_code = 901;
+                $error_message = "No Record found";
+                $data = null;
+
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => $data,
+                    'message'   => $error_message
+                ), 200);
+
+            }
+        }catch(Exception $e){
+
+            // $function_name = 'deletedactivitiestraking';   
+            // $controller_name = 'groupactivitiestraking';
+            $error_code = '901';
+            $error_message = $e->getMessage();
+            // $send_payload = null;
+            // $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            
+            if(empty($request->Location)){
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => null,
+                    'message'   => $error_message
+                ), 200);
+            }
+
+        }
     }
 
 }

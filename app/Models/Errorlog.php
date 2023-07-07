@@ -9,7 +9,7 @@ class Errorlog extends Model
 {
     use HasFactory;
 	
-	protected $table ='Errorlogs';
+	protected $table ='errorlogs';
 		
 	protected $fillable = [	'function_name','controller_name','error_code','error_message','send_payload','response'];
 }
