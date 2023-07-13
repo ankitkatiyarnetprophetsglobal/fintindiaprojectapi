@@ -277,8 +277,10 @@ Route::prefix('v2')->group(function(){
 	Route::post('getuserhistorylist',[App\Http\Controllers\v2\ChallengesController::class,'getuserhistorylist']);
 	Route::post('userhistorysactivities',[App\Http\Controllers\v2\ChallengesController::class,'userhistorysactivities']);
 	Route::post('userparticularactivities',[App\Http\Controllers\v2\ChallengesController::class,'userparticularactivities']);
-	Route::get('groupactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'groupactivitiestraking']);
+	Route::post('groupactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'groupactivitiestraking']);
 	Route::post('deletedactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'deletedactivitiestraking']);
+	Route::post('logintracking',[App\Http\Controllers\v2\TrackingController::class,'logintracking']);
+	
 
 
 	Route::get('testingvalue',[App\Http\Controllers\v2\ChallengesController::class,'testingvalue']);

@@ -22,7 +22,7 @@ class ChallengesController extends Controller
             $user_id = is_int($request->user_id);
             $groupid = is_int($request->groupid);
             $ModeGroupid = is_int($request->ModeGroupid);
-            $trip_id = is_int($request->trip_id);
+            $trip_id = $request->trip_id;
             $trip_status = is_int($request->trip_status);
             $ave_pace = $request->ave_pace;
             $speed = $request->speed;
@@ -91,7 +91,7 @@ class ChallengesController extends Controller
                 ), 200);    
             }
             
-            if($trip_id == null || $trip_id == '' || $trip_id === false){
+            if($trip_id == null || $trip_id == ''){
 
                 $error_code = '801';
                 $error_message = 'Required Trip Id';                
@@ -314,7 +314,7 @@ class ChallengesController extends Controller
             $user_id = is_int($request->user_id);
             // $groupid = is_int($request->groupid);
             $modegroupid = is_int($request->modegroupid);
-            $trip_id = is_int($request->trip_id);            
+            $trip_id = $request->trip_id;            
             $trip_name = $request->trip_name;            
             $commemt = $request->commemt;            
             $average_speed = is_int($request->average_speed);
@@ -391,7 +391,7 @@ class ChallengesController extends Controller
                 ), 200);    
             }
             
-            if($trip_id == null || $trip_id == '' || $trip_id === false){
+            if($trip_id == null || $trip_id == ''){
 
                 $error_code = '801';
                 $error_message = 'Required Trip Id';                
@@ -645,7 +645,7 @@ class ChallengesController extends Controller
             if($json_validater === true){
 
                 $user_id = is_int($request->user_id);
-                $trip_id = is_int($request->trip_id);	
+                $trip_id = $request->trip_id;	
 
                 if($user_id == null || $user_id == '' || $user_id === false){
                                 
@@ -659,7 +659,7 @@ class ChallengesController extends Controller
                         'message'   => $error_message
                     ), 200);    
                 }
-                if($trip_id == null || $trip_id == '' || $trip_id === false){
+                if($trip_id == null || $trip_id == ''){
 
                     $error_code = '801';
                     $error_message = 'Required Trip Id';                
@@ -742,6 +742,8 @@ class ChallengesController extends Controller
     public function groupactivitiestraking(Request $request){
         try{
 
+            // dd($request->all());
+
             // $user_id = is_int($request->user_id);
             
             // if($user_id == null || $user_id == '' || $user_id === false){
@@ -756,38 +758,49 @@ class ChallengesController extends Controller
             //         'message'   => $error_message
             //     ), 200);    
             // }
-            
-            $data = Userdetailsactivitiestrakings::where('status', 1)->get();    
-            // dd(count($data));
+
+            $group_id = $request->group_id;
+            $user_ids = $request->user_id;
+            $datavalue = array();
+            // $user_ids_array = explode(",",$user_ids);
+            // dd($user_ids);
+            // echo ($user_ids_array);    
+            // dd(1);    
+            foreach($user_ids as $key => $value){
+                // echo $value;
+                // echo '<br/>';
+                $data[] = Userdetailsactivitiestrakings::where('status', 1)->where('groupid', $group_id)->where('user_id', $value)->get();
+            }
+            // dd($data);
             $i = 0;
             foreach($data as $key => $value){
 
-             if($key && $data[$key-1]->user_id != $data[$key]->user_id){
-               ++$i;
-               //dd($i);
-             }
-
-                $datavalue[$i]['user_id'] = $value->user_id;
-                $datavalue[$i]['location'][] = json_decode($value->location);
-                // $datavalue['user_id'] = $value->user_id;
-                // $datavalue['location'][$key] = $value->location;
-                // $location = 
-                // $user_id = ;                
+                foreach($value as $key1 => $value1){
+                    // dd($value[0]['user_id']);
+                    // if($key1 && $value[$i]['user_id'] != $value[$i]['user_id']){
+                    
+                    //     ++$i;
+                    //    //dd($i);
+                    // }
+                    $datavalue[$key1]['user_id'] = $value1['user_id'];
+                    $datavalue[$key1]['location'][] = json_decode($value1['location']);
+                    
+                }
+               
             }
-            // dd($datavalue);
-            // $datajsonencode = json_encode($datavalue);
-            // $datastripslashes = stripslashes($datavalue);
-            // $datastripslashes = json_encode($datajsonencode, JSON_UNESCAPED_SLASHES);
-            // dd($datajsonencode);
+
             if(count($data) > 0){        
+
                 $error_code = 200;
                 $error_message = null;
+
                 return Response::json(array(
-                    'isSuccess' => 'false',
+                    'isSuccess' => 'true',
                     'code'      => $error_code,
                     'data'      => $datavalue,
                     'message'   => $error_message
                 ), 200);
+
             }else{
                 
                 $error_code = '801';
@@ -798,13 +811,55 @@ class ChallengesController extends Controller
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200);
-                
+                ), 200);                    
 
             }
+            // dd(count($data));
+            // $data = Userdetailsactivitiestrakings::where('status', 1)->get();                
+            // dd(count($data));
+            
+            // $i = 0;
+            // foreach($data as $key => $value){
+
+            //  if($key && $data[$key-1]->user_id != $data[$key]->user_id){
+            //    ++$i;
+            //    //dd($i);
+            //  }
+
+            //     $datavalue[$i]['user_id'] = $value->user_id;
+            //     $datavalue[$i]['location'][] = json_decode($value->location);
+            //     // $datavalue['user_id'] = $value->user_id;
+            //     // $datavalue['location'][$key] = $value->location;
+            //     // $location = 
+            //     // $user_id = ;                
+            // }
+            
+                // if(count($data) > 0){        
+                //     $error_code = 200;
+                //     $error_message = null;
+                //     return Response::json(array(
+                //         'isSuccess' => 'false',
+                //         'code'      => $error_code,
+                //         'data'      => $datavalue,
+                //         'message'   => $error_message
+                //     ), 200);
+                // }else{
+                    
+                //     $error_code = '801';
+                //     $error_message = "Data not found";                                
+                    
+                //     return Response::json(array(
+                //         'isSuccess' => 'false',
+                //         'code'      => $error_code,
+                //         'data'      => null,
+                //         'message'   => $error_message
+                //     ), 200);
+                    
+
+                // }
 
         }catch(Exception $e){
-
+            // dd($e->getMessage());
             // $function_name = 'userparticularactivities';   
             // $controller_name = 'groupactivitiestraking';
             $error_code = '901';
@@ -856,7 +911,7 @@ class ChallengesController extends Controller
         try{
 
             $user_id = is_int($request->user_id);
-            $trip_id = is_int($request->trip_id);
+            $trip_id = $request->trip_id;
 
             if($user_id == null || $user_id == '' || $user_id === false){
                 
@@ -871,7 +926,7 @@ class ChallengesController extends Controller
                 ), 200);    
             }
             
-            if($trip_id == null || $trip_id == '' || $trip_id === false){
+            if($trip_id == null || $trip_id == ''){
                 
                 $error_code = '801';
                 $error_message = 'Required Trip Id';                
@@ -967,5 +1022,7 @@ class ChallengesController extends Controller
 
         }
     }
+
+    
 
 }
