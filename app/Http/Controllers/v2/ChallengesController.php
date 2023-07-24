@@ -5,6 +5,7 @@ namespace App\Http\Controllers\v2;
 use App\Helpers\Helper as HelpersHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\v2\CommonController;
 use App\Models\Errorlog;
 use Response;
 use Helper;
@@ -18,7 +19,9 @@ class ChallengesController extends Controller
 {    
     
     public function userdetailsactivities(Request $request){
+
         try{
+
             $user_id = is_int($request->user_id);
             $groupid = is_int($request->groupid);
             $ModeGroupid = is_int($request->ModeGroupid);
@@ -233,13 +236,14 @@ class ChallengesController extends Controller
             
         } catch (Exception $e) {
             
-            // $function_name = 'userdetailsactivities';   
-            // $controller_name = 'ChallengesController';
+            $controller_name = 'ChallengesController';
+            $function_name = 'userdetailsactivities';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
+            $send_payload = json_encode($request->all());
+            $response = null;            
             // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             return Response::json(array(
                 'isSuccess' => 'false',
@@ -287,13 +291,14 @@ class ChallengesController extends Controller
             
         } catch (Exception $e) {
             
-            // $function_name = 'getactivities';   
-            // $controller_name = 'ChallengesController';
+            $controller_name = 'ChallengesController';
+            $function_name = 'getactivities';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
+            $send_payload = json_encode($request->all());
+            $response = null;            
             // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -548,13 +553,14 @@ class ChallengesController extends Controller
 
         } catch (Exception $e) {
             
-            // $function_name = 'getactivities';   
-            // $controller_name = 'ChallengesController';
+            $controller_name = 'ChallengesController';
+            $function_name = 'userhistorysactivities';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
-            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $send_payload = json_encode($request->all());
+            $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);3
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -614,13 +620,14 @@ class ChallengesController extends Controller
 
         } catch (Exception $e) {
             
-            // $function_name = 'getactivities';   
-            // $controller_name = 'getuserhistorylist';
+            $controller_name = 'ChallengesController';
+            $function_name = 'getuserhistorylist';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
+            $send_payload = json_encode($request->all());
+            $response = null;            
             // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -719,13 +726,14 @@ class ChallengesController extends Controller
 
         } catch (Exception $e) {
             
-            // $function_name = 'userparticularactivities';   
-            // $controller_name = 'ChallengesController';
+            $controller_name = 'ChallengesController';
+            $function_name = 'userparticularactivities';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
+            $send_payload = json_encode($request->all());
+            $response = null;            
             // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -859,14 +867,15 @@ class ChallengesController extends Controller
                 // }
 
         }catch(Exception $e){
-            // dd($e->getMessage());
-            // $function_name = 'userparticularactivities';   
-            // $controller_name = 'groupactivitiestraking';
+            
+            $controller_name = 'ChallengesController';
+            $function_name = 'groupactivitiestraking';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
+            $send_payload = json_encode($request->all());
+            $response = null;            
             // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(
@@ -881,6 +890,17 @@ class ChallengesController extends Controller
     }
 
     public function testingvalue(Request $request){
+
+        
+        $controller_name = 'ChallengesController';
+        $function_name = 'userdetailsactivities';   
+        $error_code = '901';
+        // $error_message = $e->getMessage();
+        $error_message = "error1";
+        $send_payload = "";
+        $response = "";            
+        // saverrorlogsthree($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+        $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
         $time = 1687517819;
         $date = strtotime($time);            
         // $date_value = date('Y-m-d h:i:s ',$date); 
@@ -1003,13 +1023,14 @@ class ChallengesController extends Controller
             }
         }catch(Exception $e){
 
-            // $function_name = 'deletedactivitiestraking';   
-            // $controller_name = 'groupactivitiestraking';
+            $controller_name = 'ChallengesController';
+            $function_name = 'deletedactivitiestraking';   
             $error_code = '901';
             $error_message = $e->getMessage();
-            // $send_payload = null;
-            // $response = null;            
+            $send_payload = json_encode($request->all());
+            $response = null;            
             // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
             
             if(empty($request->Location)){
                 return Response::json(array(

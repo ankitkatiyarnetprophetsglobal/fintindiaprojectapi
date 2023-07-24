@@ -16,10 +16,9 @@ class TrackingController extends Controller
 {    
     
     public function logintracking(Request $request){
-        try{
-            
-            // dd($request->all());
-            // dd($request['user_id']);
+        
+        try{            
+        
             $user_id = $request['user_id'];
             $company_name = $request['company_name'];
             $device_name = $request['device_name'];
@@ -29,6 +28,7 @@ class TrackingController extends Controller
             $api_name = $request['api_name'];
             $api_version = $request['api_version'];
             $login_datetime = $request['login_datetime'];
+            $device_token = $request['device_token'];
             $status = $request['status'];
             
             $Userdetailsactitrak = new Usertracking();
@@ -41,7 +41,8 @@ class TrackingController extends Controller
             $Userdetailsactitrak->api_name = $api_name;
             $Userdetailsactitrak->api_version = $api_version;
             $Userdetailsactitrak->login_datetime = $login_datetime;            
-            $Userdetailsactitrak->status = 1;
+            $Userdetailsactitrak->device_token = $device_token;            
+            $Userdetailsactitrak->status = $status;
             $Userdetailsactitrak->save();
 
             return Response::json(array(

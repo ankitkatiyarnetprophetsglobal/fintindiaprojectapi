@@ -279,11 +279,10 @@ Route::prefix('v2')->group(function(){
 	Route::post('userparticularactivities',[App\Http\Controllers\v2\ChallengesController::class,'userparticularactivities']);
 	Route::post('groupactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'groupactivitiestraking']);
 	Route::post('deletedactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'deletedactivitiestraking']);
+	
 	Route::post('logintracking',[App\Http\Controllers\v2\TrackingController::class,'logintracking']);
 	
-
-
-	Route::get('testingvalue',[App\Http\Controllers\v2\ChallengesController::class,'testingvalue']);
+	Route::post('testingvalue',[App\Http\Controllers\v2\ChallengesController::class,'testingvalue']);
 	
 	
 });

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Casts\Attribute;
 class Userdetailsactivitiestrakings extends Model
 {
     
@@ -26,4 +26,13 @@ class Userdetailsactivitiestrakings extends Model
 		'location',
 		'status',
 	]; 
+
+	public function getLocationAttribute($value)
+    {
+        return json_decode($value);
+    }
+
+	public function location(){
+		return $this->hasMany(Userdetailsactivitiestrakings::class,'user_id','user_id');
+	}
 }
