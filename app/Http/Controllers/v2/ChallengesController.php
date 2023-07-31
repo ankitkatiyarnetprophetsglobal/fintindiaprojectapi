@@ -927,7 +927,7 @@ class ChallengesController extends Controller
     }
 
     public function deletedactivitiestraking(Request $request){
-        // dd($request->deleted_id);
+        
         try{
 
             $user_id = is_int($request->user_id);
@@ -960,27 +960,18 @@ class ChallengesController extends Controller
             }
             
             $datadetailsactivitiestrakings = Userdetailsactivitiestrakings::where('status', 1)->where('user_id',$request->user_id)->where('trip_id',$request->trip_id)->get();   
-    
-            if(count($datadetailsactivitiestrakings) > 0){  
-                      
+            
+            $userhistorytraking_count = Userhistorytraking::where('status', 1)->where('user_id',$request->user_id)->where('trip_id',$request->trip_id)->get();   
+
+            if(count($datadetailsactivitiestrakings) > 0){
+                
                 foreach($datadetailsactivitiestrakings as $key => $value){
 
                     $deletactivities = Userdetailsactivitiestrakings::where('user_id', $value['user_id'])->where('trip_id', $value['trip_id'])->update(['status' => 0]);
                 }
-
-                // $error_code = 200;
-                // $error_message = null;
-                // $data = "Successfully Deleted Records";
-
-                // return Response::json(array(
-                //     'isSuccess' => 'true',
-                //     'code'      => $error_code,
-                //     'data'      => $data,
-                //     'message'   => $error_message
-                // ), 200);
-
+            
                 $deletedhistorytraking = Userhistorytraking::where('user_id', $request->user_id)->where('trip_id', $value['trip_id'])->update(['status' => 0]);                
-                // dd($deletedhistorytraking);
+                
                 if($deletedhistorytraking > 0){        
                     $error_code = 200;
                     $error_message = null;
@@ -1006,7 +997,35 @@ class ChallengesController extends Controller
                         'message'   => $error_message
                     ), 200);
                 }
+            }elseif(count($userhistorytraking_count) > 0){
 
+                $deletedhistorytraking = Userhistorytraking::where('user_id', $request->user_id)->where('trip_id', $request->trip_id)->update(['status' => 0]);                
+                
+                if($deletedhistorytraking > 0){        
+                    $error_code = 200;
+                    $error_message = null;
+                    $data = "Successfully Deleted Records";
+
+                    return Response::json(array(
+                        'isSuccess' => 'true',
+                        'code'      => $error_code,
+                        'data'      => $data,
+                        'message'   => $error_message
+                    ), 200);
+
+                }else{
+
+                    $error_code = 200;
+                    $error_message = "Somthing Went Wrong";
+                    $data = null;
+
+                    return Response::json(array(
+                        'isSuccess' => 'false',
+                        'code'      => $error_code,
+                        'data'      => $data,
+                        'message'   => $error_message
+                    ), 200);
+                }
             }else{
 
                 $error_code = 901;
@@ -1042,8 +1061,6 @@ class ChallengesController extends Controller
             }
 
         }
-    }
-
-    
+    }   
 
 }
