@@ -195,11 +195,20 @@ Route::prefix('v2')->group(function(){
 	
 	//
 		Route::get('location', [App\Http\Controllers\v2\Api\LocationController::class,'index']);
-		
+	
 		Route::post('food/updategoal', [App\Http\Controllers\v2\Api\FoodChartController::class,'goal']);
 		Route::post('food/calorieintake', [App\Http\Controllers\v2\Api\FoodChartController::class,'calorieintake']);
 		Route::get('getcalorieintake', [App\Http\Controllers\v2\Api\FoodChartController::class,'calorieintakeget']);
 		Route::delete('food/deletecalorieintake',[App\Http\Controllers\v2\Api\FoodChartController::class,'destroy']);  
+		
+	// posts api
+		Route::post('posts/list', [App\Http\Controllers\v2\Api\PostsController::class,'listshow']);
+		Route::post('posts/id', [App\Http\Controllers\v2\Api\PostsController::class,'showbyid']);
+		Route::post('posts/like', [App\Http\Controllers\v2\Api\PostsController::class,'likebyid']);
+		Route::post('posts/comments', [App\Http\Controllers\v2\Api\PostsController::class,'commentsbyid']);
+		Route::post('posts/category', [App\Http\Controllers\v2\Api\PostsController::class,'postscategory']);
+		
+		
 		
 	//});
 	
@@ -274,7 +283,7 @@ Route::prefix('v2')->group(function(){
 	
 	Route::get('getactivities',[App\Http\Controllers\v2\ChallengesController::class,'getactivities']);
 	Route::post('userdetailsactivities',[App\Http\Controllers\v2\ChallengesController::class,'userdetailsactivities']);
-	Route::post('getuserhistorylist',[App\Http\Controllers\v2\ChallengesController::class,'getuserhistorylist']);
+	
 	Route::post('userhistorysactivities',[App\Http\Controllers\v2\ChallengesController::class,'userhistorysactivities']);
 	Route::post('userparticularactivities',[App\Http\Controllers\v2\ChallengesController::class,'userparticularactivities']);
 	Route::post('groupactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'groupactivitiestraking']);
@@ -284,7 +293,9 @@ Route::prefix('v2')->group(function(){
 	
 	Route::post('testingvalue',[App\Http\Controllers\v2\ChallengesController::class,'testingvalue']);
 	
-	
+	Route::post('user-history-activities-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'userHistorysActivitiesv1']);		
+	Route::get('git-event-list-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'git_event_list_v1']);	
+	Route::get('git-event-certificate',[App\Http\Controllers\v2\Challengesv1Controller::class,'gitEventCertificate']);	
 });
 
 
