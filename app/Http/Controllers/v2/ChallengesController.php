@@ -576,6 +576,7 @@ class ChallengesController extends Controller
 
     public function getuserhistorylist(Request $request){
         try{
+            // dd('asdfasdfasfd');
             $user_id = is_int($request->user_id);
             
             if($user_id == null || $user_id == '' || $user_id === false){

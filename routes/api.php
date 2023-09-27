@@ -283,7 +283,7 @@ Route::prefix('v2')->group(function(){
 	
 	Route::get('getactivities',[App\Http\Controllers\v2\ChallengesController::class,'getactivities']);
 	Route::post('userdetailsactivities',[App\Http\Controllers\v2\ChallengesController::class,'userdetailsactivities']);
-	
+	Route::post('getuserhistorylist',[App\Http\Controllers\v2\ChallengesController::class,'getuserhistorylist']);
 	Route::post('userhistorysactivities',[App\Http\Controllers\v2\ChallengesController::class,'userhistorysactivities']);
 	Route::post('userparticularactivities',[App\Http\Controllers\v2\ChallengesController::class,'userparticularactivities']);
 	Route::post('groupactivitiestraking',[App\Http\Controllers\v2\ChallengesController::class,'groupactivitiestraking']);
@@ -294,8 +294,9 @@ Route::prefix('v2')->group(function(){
 	Route::post('testingvalue',[App\Http\Controllers\v2\ChallengesController::class,'testingvalue']);
 	
 	Route::post('user-history-activities-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'userHistorysActivitiesv1']);		
-	Route::get('git-event-list-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'git_event_list_v1']);	
-	Route::get('git-event-certificate',[App\Http\Controllers\v2\Challengesv1Controller::class,'gitEventCertificate']);	
+	Route::get('get-event-list-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'git_event_list_v1']);	
+	// Route::get('git-event-certificate',[App\Http\Controllers\v2\Challengesv1Controller::class,'gitEventCertificate']);
+	Route::get('download-mobile-event-certificate/{user_id}/{trip_id}',[App\Http\Controllers\v2\Challengesv1Controller::class, 'mobiledownloadFreedomCertificate'])->name('download-event-certificate');	
 });
 
 
