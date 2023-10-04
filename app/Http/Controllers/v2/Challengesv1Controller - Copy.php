@@ -19,11 +19,11 @@ use PDF;
 
 class Challengesv1Controller extends Controller
 {    
-    public function __construct() {
+    // public function __construct() {
 
-        $this->middleware('auth:api', ['except' => ['git_event_list_v1','get_User_History_List_v1','gitEventCertificate','git_event_copy_list_v1']]);
+    //     $this->middleware('auth:api', ['except' => ['git_event_list_v1','get_User_History_List_v1','gitEventCertificate']]);
 
-    }
+    // }
     
     public function userdetailsactivities(Request $request){
 
@@ -1229,70 +1229,6 @@ class Challengesv1Controller extends Controller
         
             $controller_name = 'Challengesv1Controller';
             $function_name = 'git_event_list_v1';   
-            $error_code = '901';
-            $error_message = $e->getMessage();
-            $send_payload = json_encode($request->all());
-            $response = null;            
-            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);3
-            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
-            
-            if(empty($request->Location)){
-                return Response::json(array(
-                    'isSuccess' => 'false',
-                    'code'      => $error_code,
-                    'data'      => null,
-                    'message'   => $error_message
-                ), 200);
-            }
-        }
-    }
-
-    public function git_event_copy_list_v1(Request $request){
-        try{ 
-            $user = auth('api')->user();
-            if($user){
-
-                // dd(123456789);
-                $data = EventCat::select('id','name','status')->where('status', '=', 1)->get();    
-                // dd($data);
-                $error_code = 200;
-
-                if(count($data) >0){
-                    
-                    $error_message = null; 
-
-                    return Response::json(array(
-                        'isSuccess' => 'true',
-                        'code'      => $error_code,
-                        'data'      => $data,
-                        'message'   => $error_message
-                    ), 200);
-
-                }else{
-
-                    $error_message = "Data Not Found";
-                    
-                    return Response::json(array(
-                        'isSuccess' => 'false',
-                        'code'      => $error_code,
-                        'data'      => "",
-                        'message'   => $error_message
-                    ), 200);                  
-                }
-
-            }else{
-                
-                return Response::json(array(
-                    'status'    => 'error',
-                    'code'      =>  801,
-                    'message'   =>  'Unauthorized'
-                ), 401);
-                
-            }
-        } catch(Exception $e) { 
-        
-            $controller_name = 'Challengesv1Controller';
-            $function_name = 'git_event_copy_list_v1';   
             $error_code = '901';
             $error_message = $e->getMessage();
             $send_payload = json_encode($request->all());
