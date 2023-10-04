@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\v2\CommonController;
 use App\Models\Errorlog;
+use App\Models\Trackingpic;
 use Response;
 use Helper;
 use App\Models\Userdetailsactivitiestrakings;
@@ -328,6 +329,7 @@ class Challengesv1Controller extends Controller
             // $groupid = is_int($request->groupid);
             $modegroupid = is_int($request->modegroupid);
             $trip_id = $request->trip_id;            
+            $events = $request->events;            
             $trip_name = $request->trip_name;            
             $commemt = $request->commemt;            
             $average_speed = is_int($request->average_speed);
@@ -532,7 +534,12 @@ class Challengesv1Controller extends Controller
                     'data'      => null,
                     'message'   => 'Location is Json Empty'
                 ), 200);
-            }       
+            } 
+            
+            if($events == null || $events == '' || $events === false){
+                
+                $events  = 0;  
+            }
             
             $Userdetailsactitrak = new Userhistorytraking();
             $Userdetailsactitrak->user_id = $request->user_id;
@@ -549,7 +556,7 @@ class Challengesv1Controller extends Controller
             $Userdetailsactitrak->uom = $request->uom;
             $Userdetailsactitrak->datetime = $date_value;
             $Userdetailsactitrak->location = json_encode($request->location);
-            $Userdetailsactitrak->events = $request->events;
+            $Userdetailsactitrak->events = $events;
             $Userdetailsactitrak->status = 1;
             $Userdetailsactitrak->save();
             
@@ -1146,105 +1153,33 @@ class Challengesv1Controller extends Controller
             }
         }
     }
-    public function gitEventCertificate(Request $request){
-        try{ 
-            dd('asdfasdfasdfasdfasdf');
-            // $user = auth('api')->user();
-            // if($user){
-
-                // dd($request->all());    
-                // $user_id = $request->user_id;    
-                $user_id = 1986466;    
-                // $event_id = $request->events;    
-                // $trip_id = $request->trip_id;    
-                $trip_id = 123421;    
-                // $user_history_id = $request->user_history_id;    
-                $user_history_id = "Ankit Katiyar";   
-                return view('freedomrun.freedom-participant-certificate', ['organiser_name' => $user_id, 'participant_name'=> $user_history_id]); 
-                // $pdf = PDF::loadView('freedomrun.freedom-participant-certificate',['organiser_name' => $user_id, 'participant_name'=> $user_history_id])->setPaper('a4', 'landscape');
-                // $pdf->getDomPDF()->setHttpContext(
-                // stream_context_create(['ssl'=>['allow_self_signed'=> TRUE, 'verify_peer' => FALSE, 'verify_peer_name' => FALSE, ]])
-                //     );
-                // // dd($pdf->download($trip_id.".pdf"));
-                // //return $pdf->stream($participant.".pdf");
-                // $error_code = 200;
-                // $error_message = null; 
-                // return Response::json(array(
-                //         'isSuccess' => 'true',
-                //         'code'      => $error_code,
-                //         'data'      => $pdf,
-                //         'message'   => $error_message
-                //     ), 200);
-                // return $pdf->download($trip_id.".pdf");
-
-                // $data = Userhistorytraking::select('id','trip_name','status')
-                //         ->where([
-                //             ['status', '=', 1],
-                //             ['user_id', '=' , $user_id],
-                //             ['trip_id','=',$trip_id],
-                //             ['id','=',$user_history_id]
-                //         ])->get();    
-                // // dd($data);
-                // $error_code = 200;
-
-                // if(count($data) >0){
-                    
-                //     // $error_message = null; 
-                //     $pdf = PDF::loadView('freedomrun.freedom-participant-certificate',['organiser_name' => $user_id, 'participant_name'=> $user_history_id])->setPaper('a4', 'landscape');
-                //     $pdf->getDomPDF()->setHttpContext(
-                //     stream_context_create(['ssl'=>['allow_self_signed'=> TRUE, 'verify_peer' => FALSE, 'verify_peer_name' => FALSE, ]])
-                //     );
-                //     dd($pdf->download($trip_id.".pdf"));
-                //     //return $pdf->stream($participant.".pdf");
-                //     return $pdf->download($trip_id.".pdf");
-                    // return Response::json(array(
-                    //     'isSuccess' => 'true',
-                    //     'code'      => $error_code,
-                    //     'data'      => $data,
-                    //     'message'   => $error_message
-                    // ), 200);
-
-                // }else{
-
-                //     $error_message = "Data Not Found";
-                    
-                //     return Response::json(array(
-                //         'isSuccess' => 'false',
-                //         'code'      => $error_code,
-                //         'data'      => "",
-                //         'message'   => $error_message
-                //     ), 200);                  
-                // }
-
-            // }else{
-                
-            //     return Response::json(array(
-            //         'status'    => 'error',
-            //         'code'      =>  801,
-            //         'message'   =>  'Unauthorized'
-            //     ), 401);
-                
-            // }
-        } catch(Exception $e) { 
-        
-            $controller_name = 'Challengesv1Controller';
-            $function_name = 'git_event_list_v1';   
-            $error_code = '901';
-            $error_message = $e->getMessage();
-            $send_payload = json_encode($request->all());
-            $response = null;            
-            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);3
-            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+    public function mobiledownloadFreedomCertificate($user_id,$trip_id){       
             
-            if(empty($request->Location)){
-                return Response::json(array(
-                    'isSuccess' => 'false',
-                    'code'      => $error_code,
-                    'data'      => null,
-                    'message'   => $error_message
-                ), 200);
-            }
-        }
+        $data = Trackingpic::with(['eventDetails'=>function($q){
+            $q= $q->whereStatus(true);
+        },'userDetails:id,name'])
+        ->where('status', 1)->where([['user_id', '=', $user_id],['trip_id','=',$trip_id]])->latest('id')->first();            
+        $image = $data->image;
+        $participant = $data->userDetails->name;
+        $eventDetails = $data->eventDetails->name;
+        
+        // return view('freedomrun.freedom-participant-certificate',['organiser_name' => $eventDetails, 'participant_name'=> $participant,'map_image'=> $image]);
+        
+        $pdf = PDF::loadView('freedomrun.freedom-participant-certificate',
+        [
+            'organiser_name' => $eventDetails, 
+            'participant_name'=> $participant,
+            'map_image'=> $image
+        ])
+            ->setPaper('a4', 'landscape');
+        
+        $pdf->getDomPDF()->setHttpContext(
+        
+            stream_context_create(['ssl'=>['allow_self_signed'=> TRUE, 'verify_peer' => FALSE, 'verify_peer_name' => FALSE, ]])
+        
+        );            
+        
+        return $pdf->download($participant.".pdf");        
     }
 
     public function git_event_copy_list_v1(Request $request){
