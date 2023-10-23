@@ -1971,6 +1971,7 @@ class UserController extends Controller
 					$data = User::join('usermetas', 'users.id', '=', 'usermetas.user_id')->where("users.id", $user->id)
 								->get(['users.id', 'users.role', 'users.name', 'users.email', 'users.phone', 'usermetas.user_id', 'usermetas.dob', 'usermetas.age', 'usermetas.gender', 'usermetas.address', 'usermetas.state', 'usermetas.district', 'usermetas.block', 'usermetas.city', 'usermetas.orgname', 'usermetas.udise', 'usermetas.pincode', 'usermetas.height', 'usermetas.weight', 'usermetas.image', 'usermetas.board',
 								'usermetas.created_at', 'usermetas.updated_at' ]);
+					
 					$token_data = response()->json([
 						'access_token' => $token,
 						'token_type' => 'bearer',

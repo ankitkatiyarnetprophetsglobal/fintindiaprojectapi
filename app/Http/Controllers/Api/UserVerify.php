@@ -688,71 +688,40 @@ User, Thanks for registering at FitIndia app. Your OTP code is: '.$otp.', You wi
 		   
     }
    
-   public function verifyuser(Request $request){		
-	   //dd($request);		
-	   try{ 
+   	public function verifyuser(Request $request){		
+		try{ 
 			$iv = "fedcba9876543210"; 
 			$key = "0a9b8c7d6e5f4g3h";
-				
-				if(strpos($request->reqtime, '=') == false) {
-					return Response::json(array(
-						'status'    => 'error',
-						'code'      =>  422,
-						'message'   =>  'Not valid request'
-					), 422);
-				}
-				
-				if(strpos($request->otp, '=') == false) {
-					return Response::json(array(
-						'status'    => 'error',
-						'code'      =>  422,
-						'message'   =>  'Not valid otp'
-					), 422);
-				}
-				
-				
-				/*if (strpos($request->rcaptcha, '=') == false) {
-					return Response::json(array(
-						'status'    => 'error',
-						'code'      =>  422,
-						'message'   =>  'Not valid request'
-					), 422);
-				}
-				
-				if(empty($request->captcha)) {
-					return Response::json(array(
-						'status'    => 'error',
-						'code'      =>  422,
-						'message'   =>  'Captcha Required'
-					), 422);
-				} */
-				
-				 
-			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);
-			//$rcaptchavar = $this->decrypt($key, $iv, $request->rcaptcha);
-			$otp = $this->decrypt($key, $iv, $request->otp);
-			
-			/*if($request->captcha != $rcaptchavar) {
+
+			if(strpos($request->reqtime, '=') == false) {
 				return Response::json(array(
 					'status'    => 'error',
 					'code'      =>  422,
-					'message'   =>  'Invalid Captcha'
+					'message'   =>  'Not valid request'
 				), 422);
-			}*/
-				
-			$key = $reqtimevar . 'fitind';
-			$email = $this->decrypt($key, $iv, $request->email);
-
-            //dd($otp);
-            //dd($email);
+			}
 			
-            if($otp){             
-			  $validator = Validator::make(
-			   array("otp" => $otp),[				
-				'otp' => 'required|regex:/\b\d{6}\b/']
-			  );			
+			if(strpos($request->otp, '=') == false) {
+				return Response::json(array(
+					'status'    => 'error',
+					'code'      =>  422,
+					'message'   =>  'Not valid otp'
+				), 422);
+			}	 
 
-            } else if(is_numeric($email)){				
+			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);				
+			$otp = $this->decrypt($key, $iv, $request->otp);
+			$key = $reqtimevar . 'fitind';
+			$email = $this->decrypt($key, $iv, $request->email);	
+			// dd($otp);
+			// dd($email);				
+			if($otp){             
+				$validator = Validator::make(
+				array("otp" => $otp),[				
+				'otp' => 'required|regex:/\b\d{6}\b/']
+				);			
+
+			} else if(is_numeric($email)){				
 				$validator = Validator::make(
 					array( "phone" => $email),['phone' => 'required|digits:10']
 				);
@@ -765,12 +734,7 @@ User, Thanks for registering at FitIndia app. Your OTP code is: '.$otp.', You wi
 				return Response::json(array(
 					'status' => 'error', 'code'  =>  422, 'message'   =>  'Invalid Input'
 				), 422);
-			}			
-		
-		    /*$validator = Validator::make( array("email" => $email,"otp" => $otp), [
-				'email' => 'required|email|max:156',
-				'otp' => 'required|regex:/\b\d{6}\b/'
-			]); */
+			}
 
 			if($validator->fails()) {
 				$error = $validator->errors()->first();
@@ -786,118 +750,89 @@ User, Thanks for registering at FitIndia app. Your OTP code is: '.$otp.', You wi
 			
 			if(is_numeric($email)){						
 						
-				$verifyUser = Userverification::where('phone', $email)->first();				
+				// $verifyUser = Userverification::where([['phone', $email],['isverified','=',0]])->latest()->first();	
+				$verifyUser = Userverification::where('phone', $email)->latest()->first();			
 				$cflag='0';
 			} else if(filter_var($email, FILTER_VALIDATE_EMAIL)){					
 				
-				$verifyUser = Userverification::where('email', $email)->first();				
+				// $verifyUser = Userverification::where([['email', $email],['isverified','=',0]])->latest()->first();				
+				$verifyUser = Userverification::where('email', $email)->latest()->first();
 				$cflag='1';					
 			}		
-		 
+			
 			//$verifyUser = Userverification::where('email', $email)->first();	
-		   
-		if(!empty($verifyUser)){			
+			// dd($otp);   
+		if(isset($verifyUser)){			
+			// dd($verifyUser->otp);
+			if(!empty($verifyUser->isverified)){
+				// dd($verifyUser->otp);
+				if($cflag == 1){								
+					// dd($verifyUser->otp);
+					if($otp === $verifyUser->otp){				
+						
+						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+						
+						$userverf = User::where('email', $email)->first();
+						
+						if(!empty($userverf)){	 
+						
+							User::where('email', $email)->update(['verified' => '1']);
+						}	
+							Userverification::where('email', $email)->update(['isverified' => '1']);
+							
+							return response()->json([
+							'success' => true,
+							'status'    => 'sucess',
+							'code'      =>  200,
+							'reqtime' => $request->reqtime,
+							'message' => 'Your e-mail is verified',         
+							], 200);						
+					
+					}else{
+						return Response::json(array(
+						'status'    => 'error',
+						'success' => false,
+						'code'      =>  422,
+						'message'   =>  'OTP does not match'
+						), 422);
+					}
 			
-			if(empty($verifyUser->isverified)){
+				} else if($cflag==0){
+					// dd((int)$otp);
+					// dd((int)($verifyUser->otp));
+					if((int)$otp == (int)$verifyUser->otp){				
+						
+						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+						
+						$userverf = User::where('phone', $email)->first();
+						
+						if(!empty($userverf)){	
+						
+							User::where('phone', $email)->update(['verified' => '1']);
+						}	
+							Userverification::where('phone', $email)->update(['isverified' => '1']);
+							
+							return response()->json([
+							'success' => true,
+							'status'    => 'sucess',
+							'code'      =>  200,
+							'reqtime' => $request->reqtime,
+							'message' => 'Your phone number is verified',         
+							], 200);						
+					
+					} else {
 
-             if($cflag==1){								
-	            //echo $otp."aaaa".$email; die;
-				if($otp == $verifyUser->otp){				
-					
-					//Userverification::where('email', $request->email)->update(['isverified' => '1']);
-					
-					$userverf = User::where('email', $email)->first();
-					
-					if(!empty($userverf)){	 
-					
-						User::where('email', $email)->update(['verified' => '1']);
-					}	
-						Userverification::where('email', $email)->update(['isverified' => '1']);
-						
-						return response()->json([
-						'success' => true,
-						'status'    => 'sucess',
-						'code'      =>  200,
-						'reqtime' => $request->reqtime,
-						'message' => 'Your e-mail is verified',         
-						], 200);						
-				  
-				}else{
-					return Response::json(array(
-					'status'    => 'error',
-					'success' => false,
-					'code'      =>  422,
-					'message'   =>  'OTP does not match'
-					), 422);
-				}
-				
-			 } else if($cflag==0){
-				 
-				 if($otp == $verifyUser->otp){				
-					
-					//Userverification::where('email', $request->email)->update(['isverified' => '1']);
-					
-					$userverf = User::where('phone', $email)->first();
-					
-					if(!empty($userverf)){	
-					
-						User::where('phone', $email)->update(['verified' => '1']);
-					}	
-						Userverification::where('phone', $email)->update(['isverified' => '1']);
-						
-						return response()->json([
-						'success' => true,
-						'status'    => 'sucess',
-						'code'      =>  200,
-						'reqtime' => $request->reqtime,
-						'message' => 'Your phone number is verified',         
-						], 200);						
-				  
-				} else {
-					return Response::json(array(
-					'status'    => 'error',
-					'success' => false,
-					'code'      =>  422,
-					'message'   =>  'OTP does not match'
-					), 422);
-				}
-				 
-				//echo $otp."bbbb".$email; die;///9818654322 				 
-			 }	
-			
-				/* if($otp == $verifyUser->otp){				
-					
-					//Userverification::where('email', $request->email)->update(['isverified' => '1']);
-					
-					$userverf = User::where('email', $email)->first();
-					
-					if(!empty($userverf)){	
-					
-						User::where('email', $email)->update(['verified' => '1']);
-					}	
-						Userverification::where('email', $email)->update(['isverified' => '1']);
-						
-						return response()->json([
-						'success' => true,
-						'status'    => 'sucess',
-						'code'      =>  200,
-						'reqtime' => $request->reqtime,
-						'message' => 'Your e-mail is verified',         
-						], 200);						
-				  
-				}else{
-					return Response::json(array(
-					'status'    => 'error',
-					'success' => false,
-					'code'      =>  422,
-					'message'   =>  'OTP does not match'
-					), 422);
-				} */
-			  
-			  
+						return Response::json(array(
+						'status'    => 'error',
+						'success' => false,
+						'code'      =>  422,
+						'message'   =>  'OTP does not match'
+						), 422);
+					}
+				}	
 			} else {
-			  
-			  return response()->json([
+				
+				return response()->json([
 				'success' => true,
 				'status'    => 'sucess',
 				'code'      =>  200,
@@ -906,18 +841,18 @@ User, Thanks for registering at FitIndia app. Your OTP code is: '.$otp.', You wi
 				], 200);
 			}
 
-		  } else {
+			} else {
 
-			 return Response::json(array(
+				return Response::json(array(
 					'status'    => 'error',
 					'success' => false,
 					'code'      =>  422,
 					'message'   =>  'Sorry your '.$email.' cannot be identified'
 				), 422);
-		   }
+			}
 
 		} catch(Exception $e) { 
-		   
+			
 			return Response::json(array(
 					'status'    => 'error',
 					'code'      =>  404,
@@ -925,7 +860,6 @@ User, Thanks for registering at FitIndia app. Your OTP code is: '.$otp.', You wi
 				), 404);
 			
 
-		}
-		
-		}
+		}		
+	}
  }

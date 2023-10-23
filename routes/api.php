@@ -221,6 +221,7 @@ Route::prefix('v2')->group(function(){
 	
 	Route::post('verify_user_email', [App\Http\Controllers\v2\Api\UserVerify::class, 'verify_user_email']);
 	Route::post('verifyingemail', [App\Http\Controllers\v2\Api\UserVerify::class, 'verifyuser']); 
+	Route::post('verifyuservthree', [App\Http\Controllers\v2\Api\UserVerify::class, 'verifyuserthree']); 
 	
 	Route::post('user/devicelog', [App\Http\Controllers\v2\Api\CounterlogController::class,'createdevicelog']);
 	Route::post('user/getdevicelog', [App\Http\Controllers\v2\Api\CounterlogController::class,'getdevicelog']);

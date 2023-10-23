@@ -1001,10 +1001,10 @@ class UserVerify extends Controller
 
 			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);
 			$key = $reqtimevar.'fitind';
-			$email = $this->decrypt($key, $iv, trim($request->email));//email sms send
+			$email = $this->decrypt($key, $iv, trim($request->email));//email sms send			
 			$email = trim($email);
 			$mobile = $this->decrypt($key, $iv, $request->mobile);//phone number sms send
-
+			// dd($reqtimevar);
 		    $messsages = array(
 					'email.required'=>'Please enter the email.',
 					'email.email'=>'Please enter valid email.',
@@ -1015,7 +1015,7 @@ class UserVerify extends Controller
 
 
 
-			// dd($email);
+			// dd($request->email);
 			if(empty($email) && !empty($mobile) && is_numeric($mobile) && $mobile=='0000000000'){
 
 			    return Response::json(array(
@@ -1318,5 +1318,183 @@ class UserVerify extends Controller
 						'message'   =>  'Unauthorized : '.$e->getmessage()
 					), 404);
 			}
+	}
+
+
+	public function verifyuserthree(Request $request){		
+		// dd($request->all());		
+		try{ 
+			$iv = "fedcba9876543210"; 
+			$key = "0a9b8c7d6e5f4g3h";
+
+			if(strpos($request->reqtime, '=') == false) {
+				return Response::json(array(
+					'status'    => 'error',
+					'code'      =>  422,
+					'message'   =>  'Not valid request'
+				), 422);
+			}
+			
+			if(strpos($request->otp, '=') == false) {
+				return Response::json(array(
+					'status'    => 'error',
+					'code'      =>  422,
+					'message'   =>  'Not valid otp'
+				), 422);
+			}	 
+
+			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);				
+			$otp = $this->decrypt($key, $iv, $request->otp);
+			$key = $reqtimevar . 'fitind';
+			$email = $this->decrypt($key, $iv, $request->email);	
+			// dd($otp);
+			// dd($email);				
+			if($otp){             
+				$validator = Validator::make(
+				array("otp" => $otp),[				
+				'otp' => 'required|regex:/\b\d{6}\b/']
+				);			
+
+			} else if(is_numeric($email)){				
+				$validator = Validator::make(
+					array( "phone" => $email),['phone' => 'required|digits:10']
+				);
+				
+			} else if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+				
+				$validator = Validator::make( array( "email" => $email ), ['email' => 'required|email']);
+				
+			} else{
+				return Response::json(array(
+					'status' => 'error', 'code'  =>  422, 'message'   =>  'Invalid Input'
+				), 422);
+			}
+
+			if($validator->fails()) {
+				$error = $validator->errors()->first();
+				return response()->json([
+				'success' => false,
+				'status' => 'error',
+				'code' => 400,
+				'message' => $error,         
+				], 400);
+			}
+			
+			$cflag='0';
+			
+			if(is_numeric($email)){						
+						
+				// $verifyUser = Userverification::where([['phone', $email],['isverified','=',0]])->latest()->first();	
+				$verifyUser = Userverification::where('phone', $email)->latest()->first();			
+				$cflag='0';
+			} else if(filter_var($email, FILTER_VALIDATE_EMAIL)){					
+				
+				// $verifyUser = Userverification::where([['email', $email],['isverified','=',0]])->latest()->first();				
+				$verifyUser = Userverification::where('email', $email)->latest()->first();
+				$cflag='1';					
+			}		
+			
+			//$verifyUser = Userverification::where('email', $email)->first();	
+			// dd($otp);   
+		if(isset($verifyUser)){			
+			// dd($verifyUser->otp);
+			if(!empty($verifyUser->isverified)){
+				// dd($verifyUser->otp);
+				if($cflag == 1){								
+					// dd($verifyUser->otp);
+					if($otp === $verifyUser->otp){				
+						
+						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+						
+						$userverf = User::where('email', $email)->first();
+						
+						if(!empty($userverf)){	 
+						
+							User::where('email', $email)->update(['verified' => '1']);
+						}	
+							Userverification::where('email', $email)->update(['isverified' => '1']);
+							
+							return response()->json([
+							'success' => true,
+							'status'    => 'sucess',
+							'code'      =>  200,
+							'reqtime' => $request->reqtime,
+							'message' => 'Your e-mail is verified',         
+							], 200);						
+					
+					}else{
+						return Response::json(array(
+						'status'    => 'error',
+						'success' => false,
+						'code'      =>  422,
+						'message'   =>  'OTP does not match'
+						), 422);
+					}
+			
+				} else if($cflag==0){
+					// dd((int)$otp);
+					// dd((int)($verifyUser->otp));
+					if((int)$otp == (int)$verifyUser->otp){				
+						
+						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+						
+						$userverf = User::where('phone', $email)->first();
+						
+						if(!empty($userverf)){	
+						
+							User::where('phone', $email)->update(['verified' => '1']);
+						}	
+							Userverification::where('phone', $email)->update(['isverified' => '1']);
+							
+							return response()->json([
+							'success' => true,
+							'status'    => 'sucess',
+							'code'      =>  200,
+							'reqtime' => $request->reqtime,
+							'message' => 'Your phone number is verified',         
+							], 200);						
+					
+					} else {
+
+						return Response::json(array(
+						'status'    => 'error',
+						'success' => false,
+						'code'      =>  422,
+						'message'   =>  'OTP does not match'
+						), 422);
+					}
+				}	
+			} else {
+				
+				return response()->json([
+				'success' => true,
+				'status'    => 'sucess',
+				'code'      =>  200,
+				'reqtime' => $request->reqtime,
+				'message' => 'Your data'.$email.' is already verified',         
+				], 200);
+			}
+
+			} else {
+
+				return Response::json(array(
+					'status'    => 'error',
+					'success' => false,
+					'code'      =>  422,
+					'message'   =>  'Sorry your '.$email.' cannot be identified'
+				), 422);
+			}
+
+		} catch(Exception $e) { 
+			
+			return Response::json(array(
+					'status'    => 'error',
+					'code'      =>  404,
+					'message'   =>  'Unauthorized : '.$e->getmessage()
+				), 404);
+			
+
+		}
+			
 	}
  }

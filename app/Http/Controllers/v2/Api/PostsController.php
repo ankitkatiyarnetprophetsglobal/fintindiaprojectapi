@@ -33,29 +33,42 @@ class PostsController extends Controller
         $user = auth('api')->user();
         try{ 
             if($user){
-                
+                $PostCat_data = PostCat::select('id','name','image')->where('status', '=', 1)->get();   
                 $post_category_id = $request->post_category_id;
                 
                 if($post_category_id == 'all'){
                     
-                    $data = Post::with('PostCat')->where('published', '=', 2)->paginate(10);    
-                    
+                    // $data = Post::with('PostCat')->withCount(['like' => function($q){
+                    $data_post = Post::withCount(['like' => function($q){
+                        $q->whereLikeStatus(true);
+                    }])->where('published', '=', 2)->paginate(10);    
+                    // dd($data_post);
 
                 }else{
-                   
-                    $query = Post::with('PostCat')->where('published', '=', 2);
+                        
+                    // dd($PostCat_data);
+                    // $query = Post::with('PostCat')->withCount(['like' => function($q){
+                    $query = Post::withCount(['like' => function($q){
+                        $q->whereLikeStatus(true);
+                    }])->where('published', '=', 2);
                  
                     foreach(explode(',',$request->post_category_id) as $key => $val){
 
                         if($key == 0){
                             $query = $query->whereRaw('FIND_IN_SET(?, post_category)', [$val]);
                         }else{
-                                $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
+                            $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
                         }
                     }
-                   
-                   $data = $query->paginate(10);
+                    $data_post = $query->paginate(10);
+                    
+                //    dd($PostCat_data);
                 }
+
+                $a1=array( 'PostCat_data' => $PostCat_data);
+                $a2=array("data_post" => $data_post);
+                // dd(array_merge($a1,$a2));
+                $data =array_merge($a1,$a2);
                 
                 $error_code = 200;
                              
@@ -138,7 +151,7 @@ class PostsController extends Controller
                     // $data = Post::with(
                         [
                         'comments'=>function($m){
-                            $m->wherecommentStatus(true)->select('id','user_id','post_id','comment_status','created_by','created_at');
+                            $m->wherecommentStatus(true)->select('id','user_id','comment','post_id','comment_status','created_by','created_at')->where("comment_status","=",1);
                         },
                         'comments.user:id,name',
                         'like' => function($q) use($user_id){
