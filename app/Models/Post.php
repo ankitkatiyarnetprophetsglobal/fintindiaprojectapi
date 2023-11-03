@@ -8,6 +8,7 @@ use App\Models\PostCat;
 use App\Models\User;
 use App\Models\PostsComments;
 use App\Models\PostslLike;
+use App\Models\Language;
 
 class Post extends Model
 {
@@ -33,5 +34,8 @@ class Post extends Model
     }
     public function getPostCategoryAttribute($value){
         return PostCat::select('id','name')->whereIn('id',explode(',',$value))->get();
+    }    
+    public function getPostCategorylang(){
+        return $this->hasOne(Language::class,'lang_slug','lang_slug')->select('id','lang_slug','name')->where('status','=','active');
     }    
 }

@@ -24,7 +24,7 @@ class PostsController extends Controller
      */
 	public function __construct() {
 
-        $this->middleware('auth:api', ['except' => ['listshow','showbyid','likebyid','postscategory']]);
+        $this->middleware('auth:api', ['except' => ['listshow','showbyid','likebyid','postscategory','more_comments_pagewise']]);
     
     } 
 	public function listshow(Request $request){
@@ -33,24 +33,32 @@ class PostsController extends Controller
         $user = auth('api')->user();
         try{ 
             if($user){
+                
                 $PostCat_data = PostCat::select('id','name','image')->where('status', '=', 1)->get();   
                 $post_category_id = $request->post_category_id;
+                $lang_slug = $request->lang_slug;
+                $user_id = $request->user_id;
                 
-                if($post_category_id == 'all'){
-                    
-                    // $data = Post::with('PostCat')->withCount(['like' => function($q){
-                    $data_post = Post::withCount(['like' => function($q){
-                        $q->whereLikeStatus(true);
-                    }])->where('published', '=', 2)->paginate(10);    
-                    // dd($data_post);
+                if($post_category_id == 'all' && $lang_slug == 'all'){
+                                        
+                    $data_post = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
+                        $q->whereUserId($user_id)->select('user_id','post_id','like_status');
+                        // $q->whereLikeStatus(true);                    
+                    }])
+                    ->withCount(['like' => function($q) use($user_id){
+                        $q->whereLikeStatus(true);                    
+                    }])->where([['published', '=', 2]])
+                    ->paginate(10);    
 
-                }else{
-                        
-                    // dd($PostCat_data);
-                    // $query = Post::with('PostCat')->withCount(['like' => function($q){
-                    $query = Post::withCount(['like' => function($q){
-                        $q->whereLikeStatus(true);
-                    }])->where('published', '=', 2);
+                }elseif($lang_slug == 'all'){
+                    
+                    $query = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
+                        $q->whereUserId($user_id)->select('user_id','post_id','like_status');
+                        // $q->whereLikeStatus(true);                    
+                    }])
+                    ->withCount(['like' => function($q) use($user_id){
+                        $q->whereLikeStatus(true);                    
+                    }])->where([['published', '=', 2]]);
                  
                     foreach(explode(',',$request->post_category_id) as $key => $val){
 
@@ -61,17 +69,42 @@ class PostsController extends Controller
                         }
                     }
                     $data_post = $query->paginate(10);
+
+                }elseif($post_category_id == 'all'){
                     
-                //    dd($PostCat_data);
+                    $data_post = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
+                        $q->whereUserId($user_id)->select('user_id','post_id','like_status');
+                        // $q->whereLikeStatus(true);                    
+                    }])
+                    ->withCount(['like' => function($q) use($user_id){
+                        $q->whereLikeStatus(true);                    
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug]])                
+                    ->paginate(10);    
+
+                }else{
+                    $query = Post::with('getPostCategorylang')
+                        ->withCount(['like' => function($q){
+                        $q->whereLikeStatus(true);
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug]]);
+                 
+                    foreach(explode(',',$request->post_category_id) as $key => $val){
+
+                        if($key == 0){
+                            $query = $query->whereRaw('FIND_IN_SET(?, post_category)', [$val]);
+                        }else{
+                            $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
+                        }
+                    }
+                    $data_post = $query->paginate(10);                  
+                
                 }
 
                 $a1=array( 'PostCat_data' => $PostCat_data);
                 $a2=array("data_post" => $data_post);
-                // dd(array_merge($a1,$a2));
+                
                 $data =array_merge($a1,$a2);
                 
-                $error_code = 200;
-                             
+                $error_code = 200;                             
                 
                 if(count($data) >0){
 
@@ -151,7 +184,7 @@ class PostsController extends Controller
                     // $data = Post::with(
                         [
                         'comments'=>function($m){
-                            $m->wherecommentStatus(true)->select('id','user_id','comment','post_id','comment_status','created_by','created_at')->where("comment_status","=",1);
+                            $m->wherecommentStatus(true)->select('id','user_id','comment','post_id','comment_status','created_by','created_at')->where("comment_status","=",1)->take(10);
                         },
                         'comments.user:id,name',
                         'like' => function($q) use($user_id){
@@ -285,7 +318,8 @@ class PostsController extends Controller
                 $error_code = 200;
                 $error_message = null;
                 
-                $Userdetailsactitrak = new PostslLike();
+                // $Userdetailsactitrak = new PostslLike();
+                $Userdetailsactitrak = PostslLike::updateOrCreate(['user_id' =>  $user_id], ['post_id' => $post_id]);
                 $Userdetailsactitrak->user_id = $user_id;
                 $Userdetailsactitrak->post_id = $post_id;
                 $Userdetailsactitrak->like_status = $like_status;                                        
@@ -538,5 +572,72 @@ class PostsController extends Controller
 		}
         
 	}
+
+    public function more_comments_pagewise(Request $request){        
+        // dd($request->all());
+        $user = auth('api')->user();
+        try{ 
+            if($user){
+                
+                $data = PostsComments::select('id','user_id','post_id','comment','created_at')
+                ->with(['user:id,name'])->where([['comment_status', '=', 1],['post_id','=', $request->post_id]])->paginate(10);   
+                // dd(count($data));
+                
+                $error_code = 200;                             
+                
+                if(count($data) >0){
+
+                    $error_message = null;   
+                    
+                    return Response::json(array(
+                        'isSuccess' => 'true',
+                        'code'      => $error_code,
+                        'data'      => $data,
+                        'message'   => $error_message
+                    ), 200);
+
+                }else{
+
+                    $error_message = "Data Not Found";
+                    $error_code = '201';
+                    return Response::json(array(
+                        'isSuccess' => 'false',
+                        'code'      => $error_code,
+                        'data'      => "",
+                        'message'   => $error_message
+                    ), 200);                  
+                }
+
+            }else{
+            
+                return Response::json(array(
+                    'status'    => 'error',
+                    'code'      =>  801,
+                    'message'   =>  'Unauthorized'
+                ), 401);
+                
+            }
+            
+        } catch(Exception $e) { 
+            
+            $controller_name = 'PostsController';
+            $function_name = 'more_comments_pagewise';   
+            $error_code = '901';
+            $error_message = $e->getMessage();
+            $send_payload = json_encode($request->all());
+            $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);3
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            
+            if(empty($request->Location)){
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => null,
+                    'message'   => $error_message
+                ), 200);
+            }
+		}
+    }
 
 }

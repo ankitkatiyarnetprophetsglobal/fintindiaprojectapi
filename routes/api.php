@@ -206,6 +206,7 @@ Route::prefix('v2')->group(function(){
 		Route::post('posts/id', [App\Http\Controllers\v2\Api\PostsController::class,'showbyid']);
 		Route::post('posts/like', [App\Http\Controllers\v2\Api\PostsController::class,'likebyid']);
 		Route::post('posts/comments', [App\Http\Controllers\v2\Api\PostsController::class,'commentsbyid']);
+		Route::post('posts/more-comments', [App\Http\Controllers\v2\Api\PostsController::class,'more_comments_pagewise']);
 		Route::post('posts/category', [App\Http\Controllers\v2\Api\PostsController::class,'postscategory']);
 		
 		
