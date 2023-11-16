@@ -34,13 +34,13 @@ class PostsController extends Controller
         try{ 
             if($user){
                 
-                $PostCat_data = PostCat::select('id','name','image')->where('status', '=', 1)->get();   
+                $PostCat_data = PostCat::select('id','name','image')->where('status', '=', 1)->orderBy('name', 'ASC')->get();   
                 $post_category_id = $request->post_category_id;
                 $lang_slug = $request->lang_slug;
                 $user_id = $request->user_id;
                 
                 if($post_category_id == 'all' && $lang_slug == 'all'){
-                                        
+                    //  dd($user_id);                   
                     $data_post = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
                         $q->whereUserId($user_id)->select('user_id','post_id','like_status');
                         // $q->whereLikeStatus(true);                    
