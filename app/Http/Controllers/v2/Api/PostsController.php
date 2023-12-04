@@ -454,7 +454,7 @@ class PostsController extends Controller
 
                 // }
 
-                $data  = 'Insert Success';
+                $data  = 'The comment will be displayed after approval from the admin.';
                 $error_code = 200;
                 $error_message = null;
                 
