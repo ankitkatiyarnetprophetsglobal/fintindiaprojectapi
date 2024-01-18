@@ -298,6 +298,7 @@ Route::prefix('v2')->group(function(){
 	Route::post('user-history-activities-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'userHistorysActivitiesv1']);		
 	Route::get('git-event-list-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'git_event_list_v1']);	
 	Route::get('git-event-certificate',[App\Http\Controllers\v2\Challengesv1Controller::class,'gitEventCertificate']);	
+	Route::post('get-userdetails-datewise',[App\Http\Controllers\v2\Challengesv1Controller::class,'getuserdetailsdatewise']);	
 });
 
 

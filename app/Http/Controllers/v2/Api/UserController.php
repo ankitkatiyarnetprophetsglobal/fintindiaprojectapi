@@ -1201,6 +1201,7 @@ class UserController extends Controller
 							->where('challenge.from_email', $email)
 							->orWhere('challenge.to_email', $email)
 							->select('challenge.*', 'u1.name as from_name', 'u2.name as to_name')
+							->take(15)     
 							->get(); 
 		    }		
 			$marray=array();
