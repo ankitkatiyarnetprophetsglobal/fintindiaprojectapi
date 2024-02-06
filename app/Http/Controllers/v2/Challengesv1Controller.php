@@ -1257,6 +1257,9 @@ class Challengesv1Controller extends Controller
                     
                 $user_id = is_int($request->user_id);
                 $todate = $request->todate;
+                // echo $todate;
+                $new_date = date('d/m/Y', strtotime($todate));
+                // dd($new_date);
                 $fromdate = $request->fromdate;
                 $error_code = 200;
                 $error_message = "Data Not Found";
@@ -1303,7 +1306,24 @@ class Challengesv1Controller extends Controller
                     ), 200);    
 
                 }
+                // dd($new_date);
+                // $validator = Validator::make( array( "new_date" => $new_date ), [
+                    
+                //     // 'new_date' => 'required|date_format:d-m-y'
+                //     'new_date' => 'required|date_format:d/m/Y'
 
+                // ]);
+
+                // if($validator->fails())
+                // {
+                //     return Response::json(array(
+                //         'status'    => 'error',
+                //         'code'      =>  400,
+                //         'message'   =>  array( 'msg'=>$validator->messages()->first() )
+                //     ), 400);
+
+                //     return $validator->messages()->all();
+                // }
                 $datauserhistorytraking = Userhistorytraking::
                                             select(
                                                 'user_id',
@@ -1316,7 +1336,7 @@ class Challengesv1Controller extends Controller
                                                 'distance',
                                                 'max_speed',
                                                 // DB::raw('DATE(created_by) as date'),                                                
-                                                )
+                                                )                                            
                                             ->selectRaw(
                                                 'DATE(created_by) as date'
                                                 )
@@ -1324,10 +1344,11 @@ class Challengesv1Controller extends Controller
                                                         ['status','=' , 1],
                                                         ['user_id', '=', $request->user_id]
                                                         ])
-                                            ->whereBetween(DB::raw('DATE(created_by)'), [$todate, $fromdate])
+                                            // ->whereBetween(DB::raw('DATE(created_by)'), [$todate, $fromdate])
+                                            ->whereDate('created_by', '>=', $todate)
+                                            ->whereDate('created_by', '<=', $fromdate)                                            
                                             ->get();
-                dd($datauserhistorytraking);
-            
+                                            
                 if(count($datauserhistorytraking) > 0){
                 
                     return Response::json(array(
@@ -1342,7 +1363,7 @@ class Challengesv1Controller extends Controller
                     return Response::json(array(
                         'isSuccess' => 'false',
                         'code'      => $error_code,
-                        'data'      => "",
+                        'data'      => null,
                         'message'   => $error_message
                     ), 200);
                 }

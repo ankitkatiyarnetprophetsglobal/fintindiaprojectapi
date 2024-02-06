@@ -89,6 +89,8 @@ class StepController extends Controller
 					$step = DB::table('steps')
 							->select( DB::raw("id, user_id, steps, noofevent, calorie, point, speed, distance, goal, DATE_FORMAT( for_date, '%Y/%m/%d' ) as for_date" )  )
 							->where('user_id',$user->id)->where( 'for_date', $datevar )
+                            ->orderBy('user_id', 'DESC')
+                            ->limit(30)
 							->get();
 				
 				
@@ -102,6 +104,8 @@ class StepController extends Controller
 				$step = DB::table('steps')
 							->select( DB::raw("id, user_id, steps, noofevent, calorie, point, speed, distance, goal, DATE_FORMAT( for_date,'%Y/%m/%d' ) as for_date ") )
 							->where('user_id',$user->id)
+                            ->orderBy('user_id', 'DESC')
+                            ->limit(30)
 							->get();
 							 
 				return Response::json(array(
