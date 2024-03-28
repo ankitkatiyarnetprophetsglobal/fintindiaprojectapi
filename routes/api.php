@@ -299,6 +299,11 @@ Route::prefix('v2')->group(function(){
 	Route::get('git-event-list-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'git_event_list_v1']);	
 	Route::get('git-event-certificate',[App\Http\Controllers\v2\Challengesv1Controller::class,'gitEventCertificate']);	
 	Route::post('get-userdetails-datewise',[App\Http\Controllers\v2\Challengesv1Controller::class,'getuserdetailsdatewise']);	
+
+	Route::post('get-abha-integration-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhaintegrationurl']);	
+	Route::post('post-abha-user-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'postabhauserurl']);	
+	Route::post('get-abha-user-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhauserdetail']);	
+
 });
 
 
