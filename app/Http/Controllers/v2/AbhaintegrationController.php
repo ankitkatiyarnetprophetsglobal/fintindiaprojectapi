@@ -311,12 +311,12 @@ class AbhaintegrationController extends Controller
 
             if($user){
                 
-                $abha_address = $request->abha_address;                
+                $fid = $request->fid;                
 
-                if($abha_address == null || $abha_address == ''){
+                if($fid == null || $fid == ''){
 
                     $error_code = '801';
-                    $error_message = 'Required To Abha Address';                
+                    $error_message = 'Required To Fitindia id';                
                     
                     return Response::json(array(
                         'isSuccess' => 'false',
@@ -327,9 +327,9 @@ class AbhaintegrationController extends Controller
 
                 }            
                 // dd($abha_address);
-                $datadetails = Abhauserdetails::select('abha_id','abha_address','name','dob','gender','mobile','address')
+                $datadetails = Abhauserdetails::select('abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address')
                                                 ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
-                                                ->where([['abha_address','=' , $abha_address],['abha_user_maping.status','=' , 1]])->first(); 
+                                                ->where([['abha_user_maping.fid','=' , $fid],['abha_user_maping.status','=' , 1]])->orderBy('abha_user_details.id', 'DESC')->first(); 
                 // dd(count($datadetails));
                 if(isset($datadetails)){                    
 

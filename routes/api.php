@@ -278,8 +278,8 @@ Route::prefix('v2')->group(function(){
 	Route::get('send_generate_otp/{first}/{secound}', [App\Http\Controllers\v2\Api\UserVerify::class, 'sendsms']);
 	
 	//
-	Route::post('encryt_dumy', [App\Http\Controllers\v2\ItDivController::class, 'encryptFunct']);
-	Route::post('decrypt_dumy', [App\Http\Controllers\v2\ItDivController::class, 'decryptFunct']);
+	// Route::post('encryt_dumy', [App\Http\Controllers\v2\ItDivController::class, 'encryptFunct']);
+	// Route::post('decrypt_dumy', [App\Http\Controllers\v2\ItDivController::class, 'decryptFunct']);
 	
 	// GroupChallenges api
 	
@@ -302,7 +302,16 @@ Route::prefix('v2')->group(function(){
 
 	Route::post('get-abha-integration-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhaintegrationurl']);	
 	Route::post('post-abha-user-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'postabhauserurl']);	
-	Route::post('get-abha-user-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhauserdetail']);	
+	Route::post('get-abha-user-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhauserdetail']);
+	
+	
+	
+	Route::post('post-delete-user-details',[App\Http\Controllers\v2\PermanentController::class,'permanent_delete_user']);
+	Route::post('get-delete-user-status',[App\Http\Controllers\v2\PermanentController::class,'permanent_delete_user_status']);
+	Route::post('revoke-delete-user',[App\Http\Controllers\v2\PermanentController::class,'permanent_delete_user_revoke']);
+	
+	
+
 
 });
 
