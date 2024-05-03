@@ -303,6 +303,8 @@ Route::prefix('v2')->group(function(){
 	Route::post('get-abha-integration-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhaintegrationurl']);	
 	Route::post('post-abha-user-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'postabhauserurl']);	
 	Route::post('get-abha-user-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhauserdetail']);
+	Route::post('get-detail-abha-address',[App\Http\Controllers\v2\AbhaintegrationController::class,'getdetailabhaaddress']);
+	Route::post('abha-search-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'abhasearchdetails']);
 	
 	
 	
