@@ -105,6 +105,7 @@ class AbhaintegrationController extends Controller
                 return Response::json(array(
                     'status'    => 'error',
                     'code'      =>  801,
+                    'data'   =>  null,
                     'message'   =>  'Unauthorized'
                 ), 401);
                 
@@ -134,7 +135,8 @@ class AbhaintegrationController extends Controller
 
     public function postabhauserurl(Request $request){
 
-        try{            
+        try{
+            // dd($request->all());
             $user = auth('api')->user();
 
             if($user){
@@ -144,6 +146,8 @@ class AbhaintegrationController extends Controller
                 $abha_address = $request->abha_address;
                 $name = $request->name;
                 $dob = $request->dob;
+                $month = $request->month;
+                $year = $request->year;
                 $gender = $request->gender;
                 $mobile = $request->mobile;
                 $address = $request->address;
@@ -233,7 +237,9 @@ class AbhaintegrationController extends Controller
                             $Abhausermapings->aum_id = $oldaum_id;
                             $Abhausermapings->abha_address = $abha_address;                          	
                             $Abhausermapings->name = $name;                          	
-                            $Abhausermapings->dob = $dob;                          	
+                            $Abhausermapings->dob = $dob;
+                            $Abhausermapings->month = $month;
+                            $Abhausermapings->year = $year;
                             $Abhausermapings->gender = $gender;                          	
                             $Abhausermapings->mobile = $mobile;                          	
                             $Abhausermapings->address = $address;
@@ -262,12 +268,19 @@ class AbhaintegrationController extends Controller
                         
                         $Abhausermapings = new Abhauserdetails();
                         $Abhausermapings->aum_id = $aumid;
-                        $Abhausermapings->abha_address = $abha_address;                          	
+                        $Abhausermapings->abha_address = $abha_address;
+                        $Abhausermapings->name = $name;
+                        $Abhausermapings->dob = $dob;
+                        $Abhausermapings->month = $month;
+                        $Abhausermapings->year = $year;
+                        $Abhausermapings->gender = $gender;
+                        $Abhausermapings->mobile = $mobile;
+                        $Abhausermapings->address = $address;
                         $Abhausermapings->abha_card = $abha_card;
                         $Abhausermapings->state_name = $state_name;
                         $Abhausermapings->town_name = $town_name;
                         $Abhausermapings->district_name = $district_name;
-                        $Abhausermapings->profile_image = $profile_image;                          	
+                        $Abhausermapings->profile_image = $profile_image;
                         $Abhausermapings->save();            
                     
                         return Response::json(array(
@@ -285,6 +298,7 @@ class AbhaintegrationController extends Controller
                 return Response::json(array(
                     'status'    => 'error',
                     'code'      =>  801,
+                    'data'   =>  null,
                     'message'   =>  'Unauthorized'
                 ), 401);
                 
@@ -336,23 +350,23 @@ class AbhaintegrationController extends Controller
                     ), 200);    
 
                 }            
-                // dd($abha_address);
+                
                 $datadetails = Abhauserdetails::select('abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card')
                                                 ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
                                                 ->where([['abha_user_maping.fid','=' , $fid],['abha_user_maping.status','=' , 1]])
                                                 ->orderBy('abha_user_details.id', 'DESC')->first(); 
-                // dd(count($datadetails));
+                
                 if(isset($datadetails)){                    
 
                     return Response::json(array(
 						'status'    => 'success',
 						'code'      =>  200,
-						'message'   =>  $datadetails
+						'data'   =>  $datadetails,
+						'message'   =>  null
 					), 200);	
 
-                }else{
-                    
-                    // dd("Duplicate Value");
+                }else{                   
+                
                     $error_code = '801';
                     $error_message = 'Data not found';                
                     
@@ -370,6 +384,7 @@ class AbhaintegrationController extends Controller
                 return Response::json(array(
                     'status'    => 'error',
                     'code'      =>  801,
+                    'data'   =>  null,
                     'message'   =>  'Unauthorized'
                 ), 401);
                 
@@ -378,7 +393,7 @@ class AbhaintegrationController extends Controller
         } catch(Exception $e) { 
             
             $controller_name = 'AbhaintegrationController';
-            $function_name = 'postabhauserurl';   
+            $function_name = 'getabhauserdetail';   
             $error_code = '901';
             $error_message = $e->getMessage();
             $send_payload = json_encode($request->all());
@@ -406,6 +421,21 @@ class AbhaintegrationController extends Controller
             if($user){
                 
                 $abha_address = $request->abha_address;                
+                $fid = $request->fid;                
+
+                if($fid == null || $fid == ''){
+
+                    $error_code = '801';
+                    $error_message = 'Required To Fitindia id';                
+                    
+                    return Response::json(array(
+                        'isSuccess' => 'false',
+                        'code'      => $error_code,
+                        'data'      => null,
+                        'message'   => $error_message
+                    ), 200);    
+
+                }
 
                 if($abha_address == null || $abha_address == ''){
 
@@ -419,25 +449,67 @@ class AbhaintegrationController extends Controller
                         'message'   => $error_message
                     ), 200);    
 
-                }            
-                // dd($abha_address);
-                $datadetails = Abhauserdetails::select('abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
-                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
-                                                ->where([['abha_user_details.abha_address','=' , $abha_address],['abha_user_maping.status','=' , 1]])                                                
-                                                ->orderBy('abha_user_details.id', 'DESC')->first(); 
-                // dd(count($datadetails));
-                // dd($datadetails);
-                if(isset($datadetails)){                    
+                }
 
-                    return Response::json(array(
-						'status'    => 'success',
-						'code'      =>  200,
-						'message'   =>  $datadetails
-					), 200);	
+                $datacheck = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card')
+                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
+                                                ->where([['abha_user_maping.fid','=' , $fid],['abha_user_maping.status','=' , 1]])
+                                                ->orWhere('abha_user_details.abha_address','=' , $abha_address)
+                                                // ->orderBy('abha_user_details.id', 'DESC')->first();
+                                                ->orderBy('abha_user_details.id', 'DESC')->get();
 
+                if(count($datacheck) > 0 ){                    
+                        
+                    $datadetails = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
+                                                    ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                                                    ->where([['abha_user_details.abha_address','=' , $abha_address],['abha_user_maping.status','=' , 1]])                                                
+                                                    ->orderBy('abha_user_details.id', 'DESC')->first();                     
+                    
+                    if(isset($datadetails)){ 
+                        
+                        if($datadetails['fid'] == $fid){
+
+                            $datadetailsrecods = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
+                            ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                            
+                            ->where([['abha_user_maping.fid','=' , $fid],['abha_user_maping.status','=' , 1]])                            
+                            ->orderBy('abha_user_details.id', 'DESC')->get();         
+
+                            return Response::json(array(
+                                'status'    => 'success',
+                                'code'      =>  200,
+                                'data'   =>  $datadetailsrecods,
+                                'message'   => null
+                            ), 200);	
+
+                        }else{
+
+                            $error_code = '803';
+                            $error_message = 'Already Linked';                
+                            
+                            return Response::json(array(
+                                'isSuccess' => 'false',
+                                'code'      => $error_code,
+                                'data'      => null,
+                                'message'   => $error_message
+                            ), 200); 
+                        }
+
+                    }else{
+
+                        $error_code = '801';
+                        $error_message = 'Data not found';                
+                        
+                        return Response::json(array(
+                            'isSuccess' => 'false',
+                            'code'      => $error_code,
+                            'data'      => null,
+                            'message'   => $error_message
+                        ), 200);  
+
+                    }                    
+                    
                 }else{
                     
-                    // dd("Duplicate Value");
                     $error_code = '801';
                     $error_message = 'Data not found';                
                     
@@ -448,8 +520,8 @@ class AbhaintegrationController extends Controller
                         'message'   => $error_message
                     ), 200);  
 
-                }
-                
+                }    
+
             }else{
                 
                 return Response::json(array(
@@ -493,8 +565,23 @@ class AbhaintegrationController extends Controller
                 
                 $key_search = $request->key_search;                
                 $abha_id = $request->abha_id;                
-                $mobile = $request->mobile; 
-                
+                $mobile = $request->mobile;
+                $fid = $request->fid;                
+
+                if($fid == null || $fid == ''){
+
+                    $error_code = '801';
+                    $error_message = 'Required To Fitindia id';                
+                    
+                    return Response::json(array(
+                        'isSuccess' => 'false',
+                        'code'      => $error_code,
+                        'data'      => null,
+                        'message'   => $error_message
+                    ), 200);    
+
+                }
+
                 if($key_search == null || $key_search == ''){
 
                     $error_code = '801';
@@ -527,7 +614,20 @@ class AbhaintegrationController extends Controller
 
                     $mysql_key = "abha_user_maping.abha_id";
                     $search_value = $abha_id;
+
                 }
+                // else{
+                    
+                //     $error_code = '801';
+                //         $error_message = 'Keys Not Match Abha Id';                
+                        
+                //         return Response::json(array(
+                //             'isSuccess' => 'false',
+                //             'code'      => $error_code,
+                //             'data'      => null,
+                //             'message'   => $error_message
+                //         ), 200);   
+                // }
 
                 if($key_search == "mobile"){
 
@@ -545,28 +645,80 @@ class AbhaintegrationController extends Controller
                     }
                     
                     $mysql_key = "abha_user_details.mobile";
-                    $search_value = $mobile;
-                    
+                    $search_value = $mobile;                    
                 }
+                // }else{
+                        
+                //     $error_code = '801';
+                //         $error_message = 'Keys Not Match Mobile';                
+                        
+                //         return Response::json(array(
+                //             'isSuccess' => 'false',
+                //             'code'      => $error_code,
+                //             'data'      => null,
+                //             'message'   => $error_message
+                //         ), 200);   
+                // }
 
-                // dd($mobile);
-                $datadetails = Abhauserdetails::select('abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
-                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
-                                                // ->where([['abha_user_maping.abha_id','=' , $abha_id],['abha_user_maping.status','=' , 1]])                                                
-                                                ->where([[$mysql_key,'=' , $search_value],['abha_user_maping.status','=' , 1]])                                                
-                                                ->orderBy('abha_user_details.id', 'DESC')->get(); 
-                // dd(count($datadetails));
-                // dd($datadetails);
-                if(isset($datadetails)){                    
+                $datacheck = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card')
+                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
+                                                ->where([['abha_user_maping.fid','=' , $fid],['abha_user_maping.status','=' , 1]])
+                                                ->orWhere($mysql_key,'=' , $search_value)
+                                                // ->orderBy('abha_user_details.id', 'DESC')->first();
+                                                ->orderBy('abha_user_details.id', 'DESC')->get();
 
-                    return Response::json(array(
-						'status'    => 'success',
-						'code'      =>  200,
-						'message'   =>  $datadetails
-					), 200);	
+                if(count($datacheck) > 0){
 
-                }else{
+                    $datadetails = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
+                                                    ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                                                    // ->where([['abha_user_maping.abha_id','=' , $abha_id],['abha_user_maping.status','=' , 1]])                                                
+                                                    ->where([[$mysql_key,'=' , $search_value],['abha_user_maping.status','=' , 1]])                                                
+                                                    ->orderBy('abha_user_details.id', 'DESC')->get(); 
                     
+                    
+                    // dd($datadetails[0]['fid']);
+                    // if(isset($datadetails)){     
+                    if(count($datadetails) > 0){     
+
+                        if($datadetails[0]['fid'] == $fid){
+
+                            return Response::json(array(
+                                'status'    => 'success',
+                                'code'      =>  200,
+                                'data'   =>  $datadetails,
+                                'message'   =>  null
+                            ), 200);	
+
+                        }else{
+
+                            $error_code = '803';
+                            $error_message = 'Already Linked';                
+                            
+                            return Response::json(array(
+                                'isSuccess' => 'false',
+                                'code'      => $error_code,
+                                'data'      => null,
+                                'message'   => $error_message
+                            ), 200); 
+                        }
+
+                    }else{
+                        
+                        // dd("Duplicate Value");
+                        $error_code = '801';
+                        $error_message = 'Data not found';                
+                        
+                        return Response::json(array(
+                            'isSuccess' => 'false',
+                            'code'      => $error_code,
+                            'data'      => null,
+                            'message'   => $error_message
+                        ), 200);  
+
+                    }
+                
+                }else{
+
                     // dd("Duplicate Value");
                     $error_code = '801';
                     $error_message = 'Data not found';                
@@ -576,7 +728,7 @@ class AbhaintegrationController extends Controller
                         'code'      => $error_code,
                         'data'      => null,
                         'message'   => $error_message
-                    ), 200);  
+                    ), 200); 
 
                 }
                 
@@ -585,6 +737,7 @@ class AbhaintegrationController extends Controller
                 return Response::json(array(
                     'status'    => 'error',
                     'code'      =>  801,
+                    'data'   =>  null,
                     'message'   =>  'Unauthorized'
                 ), 401);
                 
@@ -593,7 +746,7 @@ class AbhaintegrationController extends Controller
         } catch(Exception $e) { 
             
             $controller_name = 'AbhaintegrationController';
-            $function_name = 'getdetailabhaaddress';   
+            $function_name = 'abhasearchdetails';   
             $error_code = '901';
             $error_message = $e->getMessage();
             $send_payload = json_encode($request->all());
