@@ -23,7 +23,7 @@ class Challengesv1Controller extends Controller
 {    
     public function __construct() {
 
-        $this->middleware('auth:api', ['except' => ['git_event_list_v1','get_User_History_List_v1','gitEventCertificate','git_event_copy_list_v1','getuserdetailsdatewise']]);
+        $this->middleware('auth:api', ['except' => ['userHistorysActivitiesv1','git_event_list_v1','get_User_History_List_v1','gitEventCertificate','git_event_copy_list_v1','getuserdetailsdatewise']]);
 
     }
     
@@ -1097,7 +1097,7 @@ class Challengesv1Controller extends Controller
             if($user){
 
                 // dd(123456789);
-                $data = EventCat::select('id','name','status')->where('status', '=', 1)->get();    
+                $data = EventCat::select('id','name','status')->where('status', '=', 2)->get();    
                 // dd($data);
                 $error_code = 200;
 

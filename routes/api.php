@@ -299,11 +299,18 @@ Route::prefix('v2')->group(function(){
 	Route::get('git-event-list-v1',[App\Http\Controllers\v2\Challengesv1Controller::class,'git_event_list_v1']);	
 	Route::get('git-event-certificate',[App\Http\Controllers\v2\Challengesv1Controller::class,'gitEventCertificate']);	
 	Route::post('get-userdetails-datewise',[App\Http\Controllers\v2\Challengesv1Controller::class,'getuserdetailsdatewise']);	
+	
+	Route::post('user-history-activities-v2',[App\Http\Controllers\v2\Challengesv2Controller::class,'userHistorysActivitiesv2']);		
+	Route::get('get-event-list-v2',[App\Http\Controllers\v2\Challengesv2Controller::class,'geteventlistv2']);		
+	Route::post('get-userdetails-datewise-v2',[App\Http\Controllers\v2\Challengesv2Controller::class,'getuserdetailsdatewisev2']);	
 
 	Route::post('get-abha-integration-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhaintegrationurl']);	
 	Route::post('post-abha-user-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'postabhauserurl']);	
 	Route::post('get-abha-user-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhauserdetail']);
 	Route::post('get-detail-abha-address',[App\Http\Controllers\v2\AbhaintegrationController::class,'getdetailabhaaddress']);
+	Route::post('deactivate_abha_address',[App\Http\Controllers\v2\AbhaintegrationController::class,'deactivateabhaaddress']);
+	
+	
 	Route::post('abha-search-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'abhasearchdetails']);
 	
 	
