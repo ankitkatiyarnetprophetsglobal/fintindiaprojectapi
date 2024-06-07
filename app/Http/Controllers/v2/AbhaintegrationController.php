@@ -137,11 +137,11 @@ class AbhaintegrationController extends Controller
     public function postabhauserurl(Request $request){
 
         try{
-            // dd($request->all());
+            
             $user = auth('api')->user();
-
+            
             if($user){
-
+                // dd('postabhauserurl');
                 $fid = $request->fid;
                 $abha_id = $request->abha_id;            
                 $abha_address = $request->abha_address;
@@ -199,50 +199,23 @@ class AbhaintegrationController extends Controller
                     ), 200);    
 
                 }  
-                $data_deactve = Abhausermaping::select('id','fid','abha_id')->where([
-                                                                        ['fid','=' , $fid],
-                                                                        ['abha_user_maping.deactivate_abha','=' , 0],
-                                                                        ['abha_id','=' , $abha_id],['status','=' , 1]
-                                                ])
-                                        ->get();      
-                if(count($data_deactve) >0){
-                                            
-                    $update_query = Abhausermaping::where([
-                                                            ['fid','=' , $fid],
-                                                            ['abha_user_maping.abha_id','=' , $abha_id],
-                                                            ['abha_user_maping.status','=' , 1],
-                                                            ['abha_user_maping.deactivate_abha','=' , 0],
-                                                        ])
-                                                    ->update([
-                                                        'deactivate_abha' => 1
-                                                    ]);
-                    
-                    $Abhauserlogs = new Abhauserlog();
-                    $Abhauserlogs->fid = $fid;
-                    $Abhauserlogs->abha_id = $abha_id;
-                    $Abhauserlogs->status = 1;
-                    $Abhauserlogs->save();
-
-                    return Response::json(array(
-                        'isSuccess' => 'true',
-                        'code'      => 200,
-                        'data'      => null,
-                        'message'   => 'Insert Success'
-                    ), 200);
-
-                }else{
-                
-                    $dataabha_add_checkstatus = Abhauserdetails::select('id','aum_id','abha_address')
-                                                                ->where([
-                                                                            ['abha_address','=' , $abha_address],                                                                        
-                                                                            ['status','=' , 1]
-                                                                        ])
-                                                                ->get(); 
-                    
+                              
+                // dd($abha_address);    
+                $dataabha_add_checkstatus = Abhauserdetails::select('deactivate_abha','fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
+                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                                                ->where([
+                                                            ['abha_user_details.abha_address','=' , trim($abha_address)],
+                                                            ['abha_user_maping.deactivate_abha','=' , '1'],
+                                                            ['abha_user_maping.status','=' , 1]
+                                                        ])                                                
+                                                ->get();
+                                                // ->orderBy('abha_user_details.id', 'DESC')->get();                                                  
+                    // dd(count($dataabha_add_checkstatus));                                
+                    // dd($dataabha_add_checkstatus);                                
                     if(count($dataabha_add_checkstatus) >0){                    
                         
                         $error_code = '801';
-                        $error_message = 'Duplicate Abha Address';                
+                        $error_message = 'Already Linked';                
                         
                         return Response::json(array(
                             'isSuccess' => 'false',
@@ -252,17 +225,17 @@ class AbhaintegrationController extends Controller
                         ), 200);  
 
                     }else{
-
-                        $data = Abhausermaping::select('id','fid','abha_id')->where([
+                        
+                        $data = Abhausermaping::select('id','fid','abha_id','deactivate_abha')->where([
                                                                                         ['fid','=' , $fid],
                                                                                         ['abha_user_maping.deactivate_abha','=' , 1],
                                                                                         ['abha_id','=' , $abha_id],['status','=' , 1]
                                                                                     ])
                                                                             ->get();                                            
-                        
+                        // dd(count($data));
                         if(count($data) > 0){
-                        
-                            $oldaum_id = $data[0]['id'];
+                            
+                            $oldaum_id = $data[0]['id'];                            
                             $dataAbhauserdetails = Abhauserdetails::select('id','aum_id','abha_address')->where([['aum_id','=' , $oldaum_id],['abha_address','=' , $abha_address],['status','=' , 1]])->get(); 
                             
                             if(count($dataAbhauserdetails) > 0){                    
@@ -275,7 +248,7 @@ class AbhaintegrationController extends Controller
                                 ), 200);
 
                             }else{
-                        
+                                
                                 $Abhausermapings = new Abhauserdetails();
                                 $Abhausermapings->aum_id = $oldaum_id;
                                 $Abhausermapings->abha_address = $abha_address;                          	
@@ -290,7 +263,7 @@ class AbhaintegrationController extends Controller
                                 $Abhausermapings->state_name = $state_name;
                                 $Abhausermapings->town_name = $town_name;
                                 $Abhausermapings->district_name = $district_name;
-                                $Abhausermapings->profile_image = $profile_image;
+                                // $Abhausermapings->profile_image2 = $profile_image;
                                 $Abhausermapings->save();
 
                                 return Response::json(array(
@@ -302,40 +275,158 @@ class AbhaintegrationController extends Controller
                             }
                             
                         }else{                
+                            // dd('new data');
+                            $dataabha_add_checkstatus = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
+                            ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                            ->where([
+                                        ['abha_user_details.abha_address','=' , $abha_address],
+                                        ['abha_user_maping.deactivate_abha','=' , 0],
+                                        ['abha_user_maping.status','=' , 1]
+                                    ])                                                
+                            ->orderBy('abha_user_details.id', 'DESC')->get();  
+                            // dd(count($dataabha_add_checkstatus));
+                            if(count($dataabha_add_checkstatus) >0){ 
+                                // foreach ($dataabha_add_checkstatus as $key_value => $value_data) {
+
+                                //     dd($value_data['abha_address']);
+                                // }
+                                // dd('abha address is already in check');
+                                $data_fid = $dataabha_add_checkstatus[0]['fid'];
+                                // dd($data_fid);
+                                if($data_fid == $fid){
+                                    
+                                    $update_query = Abhausermaping::join('abha_user_details', 'abha_user_details.aum_id', '=', 'abha_user_maping.id')
+                                                            ->where([
+                                                                    ['abha_user_maping.fid','=' , $fid],
+                                                                    ['abha_user_details.abha_address','=' , $abha_address],
+                                                                    ['abha_user_maping.status','=' , 1],
+                                                                    ['abha_user_maping.deactivate_abha','=' , 0],
+                                                                ])
+                                                            ->update([
+                                                                'deactivate_abha' => 1
+                                                            ]); 
+                                    $Abhauserlogs = new Abhauserlog();
+                                    $Abhauserlogs->fid = $fid;
+                                    $Abhauserlogs->abha_id = $abha_id;
+                                    $Abhauserlogs->status = 1;
+                                    $Abhauserlogs->save();
+
+                                    $datatwo = Abhauserdetails::select('abha_user_maping.deactivate_abha','fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
+                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                                                ->where([
+                                                    ['abha_user_maping.fid','=' , $fid],
+                                                    ['abha_user_details.abha_address','=' , $abha_address],
+                                                    ['abha_user_maping.status','=' , 1],                                                                                                       
+                                                    ['abha_user_maping.deactivate_abha','=' , 1],
+                                                ])
+                                                ->orderBy('abha_user_details.id', 'DESC')->get();
+                                    
+                                    return Response::json(array(
+                                        'status'    => 'success',
+                                        'code'      =>  200,
+                                        'data'   =>  $datatwo,
+                                        'message'   => null
+                                    ), 200);
+
+
+
+
+                                }elseif($data_fid != $fid){                                
+                                    // dd(987654);
+                                    // dd($data_fid);
+                                    $data_retrive = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
+                                                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                                                                                ->where([
+                                                                                            ['fid','=' , $data_fid],
+                                                                                            ['abha_user_maping.deactivate_abha','=' , 0],
+                                                                                            ['abha_user_maping.status','=' , 1]
+                                                                                        ])                                                
+                                                                                ->orderBy('abha_user_details.id', 'DESC')->get();  
+                                    // dd(count($data_retrive));
+                                    if(count($data_retrive) >0){ 
+                                        // dd($data_retrive[0]['abha_id']);
+                                        // dd(count($data_retrive));
+                                        $Abhausermapings = new Abhausermaping();
+                                        $Abhausermapings->fid = $fid;
+                                        $Abhausermapings->abha_id = $data_retrive[0]['abha_id'];
+                                        $Abhausermapings->save();
+                                        $aumid = $Abhausermapings->id;    
+                                        foreach ($data_retrive as $key => $value) {
+                                            // dd($fid);
+                                            // dd($value);
+                                            // dd($value['abha_id']);
+                                            $Abhausermapings = new Abhauserdetails();
+                                            $Abhausermapings->aum_id = $aumid;
+                                            $Abhausermapings->abha_address = $value['abha_address'];
+                                            $Abhausermapings->name = $value['name'];
+                                            $Abhausermapings->dob = $value['dob'];
+                                            $Abhausermapings->month = $value['month'];
+                                            $Abhausermapings->year = $value['year'];
+                                            $Abhausermapings->gender = $value['gender'];
+                                            $Abhausermapings->mobile = $value['mobile'];
+                                            $Abhausermapings->address = $value['address'];
+                                            $Abhausermapings->abha_card = $value['abha_card'];
+                                            $Abhausermapings->state_name = $value['state_name'];
+                                            $Abhausermapings->town_name = $value['town_name'];
+                                            $Abhausermapings->district_name = $value['district_name'];                                
+                                            $Abhausermapings->profile_image = $value['profile_image'];
+                                            $Abhausermapings->save(); 
+                                        }
+                                            return Response::json(array(
+                                                'isSuccess' => 'true',
+                                                'code'      => 200,
+                                                'data'      => null,
+                                                'message'   => 'Insert Success'
+                                            ), 200);
+                                        }
+
+                                }else{
+                                    
+                                    $error_code = '801';
+                                    $error_message = 'Fitindia Id Not Found';                
+                                    
+                                    return Response::json(array(
+                                        'isSuccess' => 'false',
+                                        'code'      => $error_code,
+                                        'data'      => null,
+                                        'message'   => $error_message
+                                    ), 200);
+                                }
+
+                            }else{
+                                
+                                $Abhausermapings = new Abhausermaping();
+                                $Abhausermapings->fid = $fid;
+                                $Abhausermapings->abha_id = $abha_id;                          	
+                                $Abhausermapings->save();
+                                $aumid = $Abhausermapings->id;                
+                                
+                                $Abhausermapings = new Abhauserdetails();
+                                $Abhausermapings->aum_id = $aumid;
+                                $Abhausermapings->abha_address = $abha_address;
+                                $Abhausermapings->name = $name;
+                                $Abhausermapings->dob = $dob;
+                                $Abhausermapings->month = $month;
+                                $Abhausermapings->year = $year;
+                                $Abhausermapings->gender = $gender;
+                                $Abhausermapings->mobile = $mobile;
+                                $Abhausermapings->address = $address;
+                                $Abhausermapings->abha_card = $abha_card;
+                                $Abhausermapings->state_name = $state_name;
+                                $Abhausermapings->town_name = $town_name;
+                                $Abhausermapings->district_name = $district_name;                                
+                                $Abhausermapings->save();            
                             
-                            $Abhausermapings = new Abhausermaping();
-                            $Abhausermapings->fid = $fid;
-                            $Abhausermapings->abha_id = $abha_id;                          	
-                            $Abhausermapings->save();
-                            $aumid = $Abhausermapings->id;                
-                            
-                            $Abhausermapings = new Abhauserdetails();
-                            $Abhausermapings->aum_id = $aumid;
-                            $Abhausermapings->abha_address = $abha_address;
-                            $Abhausermapings->name = $name;
-                            $Abhausermapings->dob = $dob;
-                            $Abhausermapings->month = $month;
-                            $Abhausermapings->year = $year;
-                            $Abhausermapings->gender = $gender;
-                            $Abhausermapings->mobile = $mobile;
-                            $Abhausermapings->address = $address;
-                            $Abhausermapings->abha_card = $abha_card;
-                            $Abhausermapings->state_name = $state_name;
-                            $Abhausermapings->town_name = $town_name;
-                            $Abhausermapings->district_name = $district_name;
-                            $Abhausermapings->profile_image = $profile_image;
-                            $Abhausermapings->save();            
-                        
-                            return Response::json(array(
-                                'isSuccess' => 'true',
-                                'code'      => 200,
-                                'data'      => null,
-                                'message'   => 'Insert Success'
-                            ), 200);
-                            
+                                return Response::json(array(
+                                    'isSuccess' => 'true',
+                                    'code'      => 200,
+                                    'data'      => null,
+                                    'message'   => 'Insert Success'
+                                ), 200);
+                            }
                         }
                     }
-                }
+                
                 
             }else{
                 
@@ -503,20 +594,18 @@ class AbhaintegrationController extends Controller
                                                             ['abha_user_maping.deactivate_abha','=' , 1],
                                                             ['abha_user_maping.status','=' , 1]
                                                         ])
-                                                ->orWhere('abha_user_details.abha_address','=' , $abha_address)
-                                                // ->orderBy('abha_user_details.id', 'DESC')->first();
-                                                ->orderBy('abha_user_details.id', 'DESC')->get();
-
+                                                ->orWhere('abha_user_details.abha_address','=' , $abha_address)                                            
+                                                ->orderBy('abha_user_details.id', 'DESC')->get();                                
                 if(count($datacheck) > 0 ){                    
                         
                     $datadetails = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
                                                     ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
-                                                    ->where([
+                                                    ->where([                                                                
                                                                 ['abha_user_details.abha_address','=' , $abha_address],
                                                                 ['abha_user_maping.deactivate_abha','=' , 1],
                                                                 ['abha_user_maping.status','=' , 1]
                                                             ])                                                
-                                                    ->orderBy('abha_user_details.id', 'DESC')->first();                     
+                                                    ->orderBy('abha_user_details.id', 'DESC')->first();
                     
                     if(isset($datadetails)){ 
                         
@@ -526,6 +615,7 @@ class AbhaintegrationController extends Controller
                                                                         ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                            
                                                                         ->where([
                                                                                     ['abha_user_maping.fid','=' , $fid],
+                                                                                    ['abha_user_details.abha_address','=' , $abha_address],
                                                                                     ['abha_user_maping.deactivate_abha','=' , 1],
                                                                                     ['abha_user_maping.status','=' , 1]
                                                                                 ])                            
@@ -555,92 +645,60 @@ class AbhaintegrationController extends Controller
 
                         $datadeactive = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
                                                 ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
-                                                ->Where('abha_user_details.abha_address','=' , $abha_address)                                                
+                                                ->where([
+                                                    ['abha_user_maping.fid','=' , $fid],
+                                                    ['abha_user_details.abha_address','=' , $abha_address],
+                                                    ['abha_user_maping.deactivate_abha','=' , 0],
+                                                    ['abha_user_maping.status','=' , 1]
+                                                ])                        
                                                 ->orderBy('abha_user_details.id', 'DESC')->get();
-                        // dd($datadeactive[0]['fid']);    
+                        
                         if(count($datadeactive) > 0 ){ 
 
-                            if($datadeactive[0]['fid'] == $fid){
+                            foreach($datadeactive as $key => $value){
 
-                                // dd($datadeactive[0]['fid']);
-                                // dd($datadeactive[0]['abha_id']);
-                                $update_query = Abhausermaping::where([
-                                                                        ['abha_user_maping.abha_id','=' , $datadeactive[0]['abha_id']],
-                                                                        ['abha_user_maping.status','=' , 1],
-                                                                        ['abha_user_maping.deactivate_abha','=' , 0],
-                                                                    ])
-                                                                ->update([
-                                                                    'deactivate_abha' => 1
-                                                                ]);
-                                $Abhauserlogs = new Abhauserlog();
-                                $Abhauserlogs->fid = $fid;
-                                $Abhauserlogs->abha_id = $datadeactive[0]['abha_id'];
-                                $Abhauserlogs->status = 1;
-                                $Abhauserlogs->save();
-                                
-                                return Response::json(array(
-                                    'status'    => 'success',
-                                    'code'      =>  200,
-                                    'data'   =>  $datadeactive,
-                                    'message'   => null
-                                ), 200);
+                                if($value['fid'] == $fid){
 
-                            }else{
+                                    $abha_id = $value['abha_id'];
+                                    $update_query = Abhausermaping::join('abha_user_details', 'abha_user_details.aum_id', '=', 'abha_user_maping.id')
+                                                            ->where([
+                                                                    ['abha_user_maping.fid','=' , $fid],
+                                                                    ['abha_user_details.abha_address','=' , $abha_address],
+                                                                    ['abha_user_maping.status','=' , 1],
+                                                                    ['abha_user_maping.deactivate_abha','=' , 0],
+                                                                ])
+                                                            ->update([
+                                                                'deactivate_abha' => 1
+                                                            ]); 
+                                    $Abhauserlogs = new Abhauserlog();
+                                    $Abhauserlogs->fid = $fid;
+                                    $Abhauserlogs->abha_id = $value['abha_id'];
+                                    $Abhauserlogs->status = 1;
+                                    $Abhauserlogs->save();
 
-                                $Abhausermapings = new Abhausermaping();
-                                $Abhausermapings->fid = $fid;
-                                $Abhausermapings->abha_id = $datadeactive[0]['abha_id'];                          	
-                                $Abhausermapings->deactivate_abha = 1;                          	
-                                $Abhausermapings->save();
-                                $aumid = $Abhausermapings->id;
+                                    $datatwo = Abhauserdetails::select('abha_user_maping.deactivate_abha','fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
+                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
+                                                ->where([
+                                                    ['abha_user_maping.fid','=' , $fid],
+                                                    ['abha_user_details.abha_address','=' , $abha_address],
+                                                    ['abha_user_maping.status','=' , 1],                                                                                                       
+                                                    ['abha_user_maping.deactivate_abha','=' , 1],
+                                                ])
+                                                ->orderBy('abha_user_details.id', 'DESC')->get();
+                                    
+                                    return Response::json(array(
+                                        'status'    => 'success',
+                                        'code'      =>  200,
+                                        'data'   =>  $datatwo,
+                                        'message'   => null
+                                    ), 200);
 
-                                $Abhausermapings = new Abhauserdetails();
-                                $Abhausermapings->aum_id = $aumid;
-                                $Abhausermapings->abha_address = $datadeactive[0]['abha_address'];;
-                                $Abhausermapings->name = $datadeactive[0]['name'];
-                                $Abhausermapings->dob = $datadeactive[0]['dob'];
-                                $Abhausermapings->month = $datadeactive[0]['month'];
-                                $Abhausermapings->year = $datadeactive[0]['year'];
-                                $Abhausermapings->gender = $datadeactive[0]['gender'];
-                                $Abhausermapings->mobile = $datadeactive[0]['mobile'];
-                                $Abhausermapings->address = $datadeactive[0]['address'];
-                                $Abhausermapings->abha_card = $datadeactive[0]['abha_card'];
-                                $Abhausermapings->state_name = $datadeactive[0]['state_name'];
-                                $Abhausermapings->town_name = $datadeactive[0]['town_name'];
-                                $Abhausermapings->district_name = $datadeactive[0]['district_name'];;
-                                $Abhausermapings->profile_image = $datadeactive[0]['profile_image'];;
-                                $Abhausermapings->save();
-                                
-                                $datadetailsrecodshow = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image')
-                                                                        ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                            
-                                                                        ->where([
-                                                                                    ['abha_user_maping.fid','=' , $fid],
-                                                                                    ['abha_user_maping.deactivate_abha','=' , 1],
-                                                                                    ['abha_user_maping.status','=' , 1]
-                                                                                ])                            
-                                                                        ->orderBy('abha_user_details.id', 'DESC')->get();         
-
-                                return Response::json(array(
-                                    'status'    => 'success',
-                                    'code'      =>  200,
-                                    'data'   =>  $datadetailsrecodshow,
-                                    'message'   => null
-                                ), 200);
-                                // $error_code = '801';
-                                // $error_message = 'Data not found';                
-                                
-                                // return Response::json(array(
-                                //     'isSuccess' => 'false',
-                                //     'code'      => $error_code,
-                                //     'data'      => null,
-                                //     'message'   => $error_message
-                                // ), 200);      
-                            }                            
-                                                    
+                                }                               
+                            }                       
                         }else{
                             
-                            $error_code = '801';
-                            $error_message = 'Data not found';                
+                            $error_code = '802';
+                            $error_message = 'Abha Address Found But not Fitindia ID Not Found';                 
                             
                             return Response::json(array(
                                 'isSuccess' => 'false',
@@ -654,9 +712,9 @@ class AbhaintegrationController extends Controller
                     
                 }else{
 
-                    $error_code = '801';
-                    $error_message = 'Data not found';                
-                    
+                    $error_code = '802';                                   
+                    $error_message = 'Data not found'; 
+
                     return Response::json(array(
                         'isSuccess' => 'false',
                         'code'      => $error_code,
@@ -701,8 +759,8 @@ class AbhaintegrationController extends Controller
      
     public function abhasearchdetails(Request $request){
 
-        try{   
-            // dd($request->fid());         
+        try{
+            // dd(1);    
             $user = auth('api')->user();
 
             if($user){
@@ -759,19 +817,7 @@ class AbhaintegrationController extends Controller
                     $mysql_key = "abha_user_maping.abha_id";
                     $search_value = $abha_id;
 
-                }
-                // else{
-                    
-                //     $error_code = '801';
-                //         $error_message = 'Keys Not Match Abha Id';                
-                        
-                //         return Response::json(array(
-                //             'isSuccess' => 'false',
-                //             'code'      => $error_code,
-                //             'data'      => null,
-                //             'message'   => $error_message
-                //         ), 200);   
-                // }
+                }                
 
                 if($key_search == "mobile"){
 
@@ -791,145 +837,169 @@ class AbhaintegrationController extends Controller
                     $mysql_key = "abha_user_details.mobile";
                     $search_value = $mobile;                    
                 }
-                // }else{
-                        
-                //     $error_code = '801';
-                //         $error_message = 'Keys Not Match Mobile';                
-                        
-                //         return Response::json(array(
-                //             'isSuccess' => 'false',
-                //             'code'      => $error_code,
-                //             'data'      => null,
-                //             'message'   => $error_message
-                //         ), 200);   
-                // }
-
-                $datacheck = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card')
+                // dd(321);
+                    // $datafidcheck = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card')
+                    // ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
+                    // ->where([
+                    //         ['abha_user_maping.fid','=' , $fid]                            
+                    //     ])                                 
+                    // ->orderBy('abha_user_details.id', 'DESC')->get();
+                    // // dd(count($datafidcheck));
+                    // if(count($datafidcheck) == 0){
+                    //     $error_code = '802';
+                    //         $error_message = 'Data not found';                
+                            
+                    //         return Response::json(array(
+                    //             'isSuccess' => 'false',
+                    //             'code'      => $error_code,
+                    //             'data'      => null,
+                    //             'message'   => $error_message
+                    //         ), 200); 
+                    // }else{    
+                        $datacheck = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card')
                                                 ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
                                                 ->where([
                                                         ['abha_user_maping.fid','=' , $fid],
                                                         ['abha_user_maping.deactivate_abha','=' , 1],
-                                                        ['abha_user_maping.status','=' , 1]
+                                                        ['abha_user_maping.status','=' , 1],
+                                                        // [$mysql_key,'=' , $search_value]
                                                     ])
-                                                ->orWhere($mysql_key,'=' , $search_value)
-                                                // ->orderBy('abha_user_details.id', 'DESC')->first();
+                                                ->orWhere($mysql_key,'=' , $search_value)                
                                                 ->orderBy('abha_user_details.id', 'DESC')->get();
-                
-                if(count($datacheck) > 0){
+                        // dd(count($datacheck));                            
+                        if(count($datacheck) > 0){
 
-                    $datadetails = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
-                                                    ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                
-                                                    // ->where([['abha_user_maping.abha_id','=' , $abha_id],['abha_user_maping.status','=' , 1]])                                                
-                                                    ->where([
-                                                                [$mysql_key,'=' , $search_value],
-                                                                ['abha_user_maping.deactivate_abha','=' , 1],
-                                                                ['abha_user_maping.status','=' , 1]
-                                                            ])
-                                                    ->orderBy('abha_user_details.id', 'DESC')->get(); 
-                    
-                    if(count($datadetails) > 0){     
+                            $datadetails = Abhauserdetails::select('abha_user_maping.deactivate_abha','fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
+                                                            ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                                                                                                    
+                                                            ->where([
+                                                                        // ['abha_user_maping.fid','=' , $fid],
+                                                                        [$mysql_key,'=' , $search_value],
+                                                                        ['abha_user_maping.deactivate_abha','=' , 1],
+                                                                        ['abha_user_maping.status','=' , 1]
+                                                                    ])
+                                                            ->orderBy('abha_user_details.id', 'DESC')->get(); 
+                            // dd(count($datadetails));
+                            if(count($datadetails) > 0){     
 
-                        if($datadetails[0]['fid'] == $fid){
+                                foreach($datadetails as $key1 => $value1){
 
-                            return Response::json(array(
-                                'status'    => 'success',
-                                'code'      =>  200,
-                                'data'   =>  $datadetails,
-                                'message'   =>  null
-                            ), 200);	
+                                        $error_code = '803';
+                                        $error_message = 'Already Linked';                
+                                        
+                                        return Response::json(array(
+                                            'isSuccess' => 'false',
+                                            'code'      => $error_code,
+                                            'data'      => null,
+                                            'message'   => $error_message
+                                        ), 200); 
+                                    }
+                                    // if($value1['fid'] == $fid){
+                                    //         return Response::json(array(
+                                    //         'status'    => 'success',
+                                    //         'code'      =>  200,
+                                    //         'data'   =>  $datadetails,
+                                    //         'message'   =>  null
+                                    //     ), 200);
+                                    // }
+                                    // if($datadetails[0]['fid'] == $fid){
 
-                        }else{
+                                    //     return Response::json(array(
+                                    //         'status'    => 'success',
+                                    //         'code'      =>  200,
+                                    //         'data'   =>  $datadetails,
+                                    //         'message'   =>  null
+                                    //     ), 200);	
 
-                            $error_code = '803';
-                            $error_message = 'Already Linked';                
-                            
-                            return Response::json(array(
-                                'isSuccess' => 'false',
-                                'code'      => $error_code,
-                                'data'      => null,
-                                'message'   => $error_message
-                            ), 200); 
-                        }
+                                    // }else{
 
-                    }else{                        
-                        
-                        $datacheckdeactive = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
-                                                ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
-                                                ->where($mysql_key,'=' , $search_value)
-                                                // ->orderBy('abha_user_details.id', 'DESC')->first();
-                                                ->orderBy('abha_user_details.id', 'DESC')->get();
-                        // dd(count($datacheckdeactive));
-                        if(count($datacheckdeactive) > 0){
+                                    //     $error_code = '803';
+                                    //     $error_message = 'Already Linked';                
+                                        
+                                    //     return Response::json(array(
+                                    //         'isSuccess' => 'false',
+                                    //         'code'      => $error_code,
+                                    //         'data'      => null,
+                                    //         'message'   => $error_message
+                                    //     ), 200); 
+                                    // }
+                                // }
 
-                            if($datacheckdeactive[0]['fid'] == $fid){
-
-                                // dd($datacheckdeactive[0]['abha_id']);
-                                $update_query = Abhausermaping::where([
-                                                                        ['abha_user_maping.abha_id','=' , $datacheckdeactive[0]['abha_id']],
-                                                                        ['abha_user_maping.status','=' , 1],
-                                                                        ['abha_user_maping.deactivate_abha','=' , 0],
-                                                                        ])
-                                                                ->update([
-                                                                    'deactivate_abha' => 1
-                                                                ]);
-                                $Abhauserlogs = new Abhauserlog();
-                                $Abhauserlogs->fid = $fid;
-                                $Abhauserlogs->abha_id = $datacheckdeactive[0]['abha_id'];
-                                $Abhauserlogs->status = 1;
-                                $Abhauserlogs->save();
-
-                                return Response::json(array(
-                                    'status'    => 'success',
-                                    'code'      =>  200,
-                                    'data'   =>  $datacheckdeactive,
-                                    'message'   =>  null
-                                ), 200);
-                            
-                            }else{
-
-                                // dd(999999999);
-                                $Abhausermapings = new Abhausermaping();
-                                $Abhausermapings->fid = $fid;
-                                $Abhausermapings->abha_id = $datacheckdeactive[0]['abha_id'];                          	
-                                $Abhausermapings->deactivate_abha = 1;                          	
-                                $Abhausermapings->save();
-                                $aumid = $Abhausermapings->id;
-
-                                $Abhausermapings = new Abhauserdetails();
-                                $Abhausermapings->aum_id = $aumid;
-                                $Abhausermapings->abha_address = $datacheckdeactive[0]['abha_address'];;
-                                $Abhausermapings->name = $datacheckdeactive[0]['name'];
-                                $Abhausermapings->dob = $datacheckdeactive[0]['dob'];
-                                $Abhausermapings->month = $datacheckdeactive[0]['month'];
-                                $Abhausermapings->year = $datacheckdeactive[0]['year'];
-                                $Abhausermapings->gender = $datacheckdeactive[0]['gender'];
-                                $Abhausermapings->mobile = $datacheckdeactive[0]['mobile'];
-                                $Abhausermapings->address = $datacheckdeactive[0]['address'];
-                                $Abhausermapings->abha_card = $datacheckdeactive[0]['abha_card'];
-                                $Abhausermapings->state_name = $datacheckdeactive[0]['state_name'];
-                                $Abhausermapings->town_name = $datacheckdeactive[0]['town_name'];
-                                $Abhausermapings->district_name = $datacheckdeactive[0]['district_name'];;
-                                $Abhausermapings->profile_image = $datacheckdeactive[0]['profile_image'];;
-                                $Abhausermapings->save();
-
-                                $datadetailsrecodshow = Abhauserdetails::select('fid','abha_user_details.id','abha_id','abha_address','name','dob','month','year','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
-                                                                        ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')                            
-                                                                        ->where([
+                            }else{                        
+                                
+                                $datacheckdeactive = Abhauserdetails::select('abha_user_maping.deactivate_abha','fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
+                                                        ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
+                                                        // ->where($mysql_key,'=' , $search_value)
+                                                        ->where([
+                                                            ['abha_user_maping.fid','=' , $fid],
+                                                            [$mysql_key,'=' , $search_value],                                                    
+                                                            ['abha_user_maping.status','=' , 1]
+                                                        ])
+                                                        ->orderBy('abha_user_details.id', 'DESC')->get();
+                                // dd(987564564);
+                                // dd(count($datacheckdeactive));
+                                if(count($datacheckdeactive) > 0){
+                                    
+                                    foreach($datacheckdeactive as $key => $value){
+                                        
+                                        $abha_id = $value['abha_id'];
+                                        // echo '<br/>';
+                                        // echo $fid;
+                                        // dd($fid);
+                                        if($value['fid'] == $fid){
+                                            // dd($value['fid']);
+                                            $update_query = Abhausermaping::where([
                                                                                     ['abha_user_maping.fid','=' , $fid],
-                                                                                    ['abha_user_maping.deactivate_abha','=' , 1],
-                                                                                    ['abha_user_maping.status','=' , 1]
-                                                                                ])                            
-                                                                        ->orderBy('abha_user_details.id', 'DESC')->get();         
+                                                                                    ['abha_user_maping.abha_id','=' , $abha_id],
+                                                                                    ['abha_user_maping.status','=' , 1],
+                                                                                    ['abha_user_maping.deactivate_abha','=' , 0],
+                                                                                    ])
+                                                                            ->update([
+                                                                                'deactivate_abha' => 1
+                                                                            ]);
+                                            $Abhauserlogs = new Abhauserlog();
+                                            $Abhauserlogs->fid = $fid;
+                                            $Abhauserlogs->abha_id = $abha_id;
+                                            $Abhauserlogs->status = 1;
+                                            $Abhauserlogs->save();
+                                            
+                                            $datatwo = Abhauserdetails::select('abha_user_maping.deactivate_abha','fid','abha_user_details.id','abha_id','abha_address','name','dob','gender','mobile','address','abha_card','state_name','town_name','district_name','profile_image','month','year')
+                                                        ->join('abha_user_maping', 'abha_user_maping.id', '=', 'abha_user_details.aum_id')
+                                                        // ->where($mysql_key,'=' , $search_value)
+                                                        ->where([
+                                                            ['abha_user_maping.fid','=' , $fid],
+                                                            ['abha_user_maping.abha_id','=' , $abha_id],
+                                                            ['abha_user_maping.status','=' , 1],                                                                                                       
+                                                            ['abha_user_maping.deactivate_abha','=' , 1],
+                                                        ])
+                                                        ->orderBy('abha_user_details.id', 'DESC')->get();
 
-                                return Response::json(array(
-                                    'status'    => 'success',
-                                    'code'      =>  200,
-                                    'data'   =>  $datadetailsrecodshow,
-                                    'message'   => null
-                                ), 200);
-                            }    
+                                            return Response::json(array(
+                                                'status'    => 'success',
+                                                'code'      =>  200,
+                                                'data'   =>  $datatwo,
+                                                'message'   =>  null
+                                            ), 200);
+                                        
+                                        }
+                                    }
+                                          
+                                }else{
+                                    // dd(987);
+                                    $error_code = '802';
+                                    $error_message = 'Data Mismatch';                
+                                    
+                                    return Response::json(array(
+                                        'isSuccess' => 'false',
+                                        'code'      => $error_code,
+                                        'data'      => null,
+                                        'message'   => $error_message
+                                    ), 200);
+                                }
+                            }
+                        
                         }else{
-                            $error_code = '801';
+                           
+                            $error_code = '802';
                             $error_message = 'Data not found';                
                             
                             return Response::json(array(
@@ -937,25 +1007,10 @@ class AbhaintegrationController extends Controller
                                 'code'      => $error_code,
                                 'data'      => null,
                                 'message'   => $error_message
-                            ), 200);
+                            ), 200); 
+
                         }
-                          
-
-                    }
-                
-                }else{
-                    
-                    $error_code = '801';
-                    $error_message = 'Data not found';                
-                    
-                    return Response::json(array(
-                        'isSuccess' => 'false',
-                        'code'      => $error_code,
-                        'data'      => null,
-                        'message'   => $error_message
-                    ), 200); 
-
-                }
+                    // }
                 
             }else{
                 
@@ -994,7 +1049,7 @@ class AbhaintegrationController extends Controller
     public function deactivateabhaaddress(Request $request){
 
         try{   
-            // dd($request->fid);         
+            
             $user = auth('api')->user();
 
             if($user){                
@@ -1047,8 +1102,7 @@ class AbhaintegrationController extends Controller
                                                             ])
                                     ->update([
                                         'deactivate_abha' => 0
-                                    ]);
-                    
+                                    ]);                    
                     $Abhauserlogs = new Abhauserlog();
                     $Abhauserlogs->fid = $fid;
                     $Abhauserlogs->abha_id = $abha_id;
@@ -1059,7 +1113,7 @@ class AbhaintegrationController extends Controller
                         'isSuccess' => 'true',
                         'code'      => 200,
                         'data'      => null,
-                        'message'   => 'Updated Successfully'
+                        'message'   => 'Deactivate Successfully'
                     ), 200);
                 }else{
                     

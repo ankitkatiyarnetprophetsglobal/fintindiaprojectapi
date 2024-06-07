@@ -14,6 +14,7 @@ class Abhauserdetails extends Model
 	
 	protected $fillable = [
 		'id',
+		'aum_id',
 		'abha_id',
 		'abha_address',
 		'name',
