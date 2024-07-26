@@ -308,10 +308,17 @@ Route::prefix('v2')->group(function(){
 	Route::post('post-abha-user-url',[App\Http\Controllers\v2\AbhaintegrationController::class,'postabhauserurl']);	
 	Route::post('get-abha-user-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'getabhauserdetail']);
 	Route::post('get-detail-abha-address',[App\Http\Controllers\v2\AbhaintegrationController::class,'getdetailabhaaddress']);
+	Route::post('abha-search-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'abhasearchdetails']);	
+	Route::post('abha-search-mobile-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'abhamobilesearchdetails']);	
 	Route::post('deactivate_abha_address',[App\Http\Controllers\v2\AbhaintegrationController::class,'deactivateabhaaddress']);
-	
-	
-	Route::post('abha-search-details',[App\Http\Controllers\v2\AbhaintegrationController::class,'abhasearchdetails']);
+	Route::post('deactivate-abha-address-v2',[App\Http\Controllers\v2\AbhaintegrationController::class,'deactivateabhaaddressv2']);
+
+	Route::post('get-abha-integration-url-v1',[App\Http\Controllers\v2\Abhaintegrationv1Controller::class,'getabhaintegrationurlv1']);	
+	Route::post('post-abha-user-url-v1',[App\Http\Controllers\v2\Abhaintegrationv1Controller::class,'postabhauserurlv1']);	
+	Route::post('get-abha-user-details-v1',[App\Http\Controllers\v2\Abhaintegrationv1Controller::class,'getabhauserdetailv1']);
+	Route::post('get-detail-abha-address-v1',[App\Http\Controllers\v2\Abhaintegrationv1Controller::class,'getdetailabhaaddressv1']);
+	Route::post('abha-search-details-v1',[App\Http\Controllers\v2\Abhaintegrationv1Controller::class,'abhasearchdetailsv1']);		
+	Route::post('deactivate-abha-address-v1',[App\Http\Controllers\v2\Abhaintegrationv1Controller::class,'deactivateabhaaddressv1']);
 	
 	
 	
@@ -320,8 +327,9 @@ Route::prefix('v2')->group(function(){
 	Route::post('revoke-delete-user',[App\Http\Controllers\v2\PermanentController::class,'permanent_delete_user_revoke']);
 	
 	
-
-
+	
+	
+	Route::post('example-functions',[App\Http\Controllers\v2\ExampleController::class,'examplefunctions']);
 });
 
 
