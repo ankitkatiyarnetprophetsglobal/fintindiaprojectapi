@@ -16,7 +16,7 @@ class UserInfo extends Controller
     }
 	
 	public function index(){
-		dd(132135465);
+		
 		$user = auth('api')->user();
 		if($user->id){
 			$results = UserInfos::where('user_id',$user->id)->first();

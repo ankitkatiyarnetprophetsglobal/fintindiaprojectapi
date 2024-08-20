@@ -86,33 +86,69 @@ class GenController extends Controller
 			}
 	}	 */
    
-	public function devicedetail(Request $request)
-    {
-		$logdata = new DeviceDetail();
-		if(!empty($request->user_id)) $logdata->user_id = $request->user_id;
-		if(!empty($request->deviceType)) $logdata->deviceType = $request->deviceType;
-		if(!empty($request->deviceVersion)) $logdata->deviceVersion = $request->deviceVersion;
-		if(!empty($request->deviceName)) $logdata->deviceName = $request->deviceName;
-		if(!empty($request->sensorPresent)) $logdata->sensorPresent = $request->sensorPresent;
+	public function devicedetail(Request $request){		
 		
-		$logdata->logfor = 'login';
-		date_default_timezone_set("Asia/Calcutta");
-		$cdate = date("Y-m-d h:i:s");
-		$logdata->createDate = $cdate;
-		
-		if($logdata->save()){
-			return Response::json(array(
-			'status'    => 'success',
-			'code'      =>  200,
-			'data'   => 'Data inserted'
-		  ), 200);
-		}else{
-			return Response::json(array(
-			'status'    => 'error',
-			'code'      =>  401,
-			'data'   => 'Some technical issue'
-		  ), 401);
-		}		
+		try{
+			
+			$user_id = $request->user_id;
+			// dd(is_numeric($user_id));
+			if($user_id == null || $user_id == '' || is_numeric($user_id) === false){
+					
+				$error_code = '801';
+				$error_message = 'Required User id';                
+				
+				return Response::json(array(
+					'isSuccess' => 'false',
+					'code'      => $error_code,
+					'data'      => null,
+					'message'   => $error_message
+				), 200);    
+			}
+
+			$logdata = new DeviceDetail();
+			if(!empty($request->user_id)) $logdata->user_id = $request->user_id;
+			if(!empty($request->deviceType)) $logdata->deviceType = $request->deviceType;
+			if(!empty($request->deviceVersion)) $logdata->deviceVersion = $request->deviceVersion;
+			if(!empty($request->deviceName)) $logdata->deviceName = $request->deviceName;
+			if(!empty($request->sensorPresent)) $logdata->sensorPresent = $request->sensorPresent;
+			
+			$logdata->logfor = 'login';
+			date_default_timezone_set("Asia/Calcutta");
+			$cdate = date("Y-m-d h:i:s");
+			$logdata->createDate = $cdate;
+			
+			if($logdata->save()){
+						return Response::json(array(
+						'status'    => 'success',
+						'code'      =>  200,
+						'data'   => 'Data inserted'
+					), 200);
+			}else{
+					return Response::json(array(
+					'status'    => 'error',
+					'code'      =>  401,
+					'data'   => 'Some technical issue'
+				), 401);
+			}
+
+		} catch (Exception $e) {
+            
+            $controller_name = 'GenController';
+            $function_name = 'devicedetail';   
+            $error_code = '901';
+            $error_message = $e->getMessage();
+            $send_payload = json_encode($request->all());
+            $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            
+            return Response::json(array(
+                'isSuccess' => 'false',
+                'code'      => $error_code,
+                'data'      => null,
+                'message'   => $error_message
+            ), 200);
+        } 
 	}
 	
 	public function getreward(Request $request)

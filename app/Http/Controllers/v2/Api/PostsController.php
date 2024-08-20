@@ -47,7 +47,7 @@ class PostsController extends Controller
                     }])
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
-                    }])->where([['published', '=', 2]])
+                    }])->where([['published', '=', 2],['status', '=', 1]])
                     ->paginate(10);    
 
                 }elseif($lang_slug == 'all'){
@@ -58,7 +58,7 @@ class PostsController extends Controller
                     }])
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
-                    }])->where([['published', '=', 2]]);
+                    }])->where([['published', '=', 2],['status', '=', 1]]);
                  
                     foreach(explode(',',$request->post_category_id) as $key => $val){
 
@@ -78,14 +78,14 @@ class PostsController extends Controller
                     }])
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
-                    }])->where([['published', '=', 2],['lang_slug',$lang_slug]])                
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]])                
                     ->paginate(10);    
 
                 }else{
                     $query = Post::with('getPostCategorylang')
                         ->withCount(['like' => function($q){
                         $q->whereLikeStatus(true);
-                    }])->where([['published', '=', 2],['lang_slug',$lang_slug]]);
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]]);
                  
                     foreach(explode(',',$request->post_category_id) as $key => $val){
 
