@@ -265,6 +265,7 @@ Route::prefix('v2')->group(function(){
 	Route::post('user/getreward', [App\Http\Controllers\v2\Api\GenController::class,'getreward']);
 	
 	Route::get('getactive', [App\Http\Controllers\v2\Api\GenController::class,'get_active']);
+	Route::post('postgetactive', [App\Http\Controllers\v2\Api\GenController::class,'post_get_active']);
 	Route::get('getdietplan', [App\Http\Controllers\v2\Api\GenController::class,'get_dietplan']);
 	
 	/**** 1-12-2021 ****/

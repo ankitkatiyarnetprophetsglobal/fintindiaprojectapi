@@ -14,6 +14,27 @@ class GenController extends Controller
 {
 	public function get_active(Request $request)
     {
+		// dd('get_active');
+		$data = GetActive::all();
+		
+			if($data->count() > 0){
+				return Response::json(array(
+					'status'    => 'success',
+					'code'      =>  200,
+					'data'   => $data
+				), 200);
+			}else{
+				return Response::json(array(
+					'status'    => 'error',
+					'code'      =>  401,
+					'data'   => 'Data not found'
+				), 401);
+			}
+	}
+	
+	public function post_get_active(Request $request)
+    {
+		// dd('post_get_active');
 		$data = GetActive::all();
 		
 			if($data->count() > 0){

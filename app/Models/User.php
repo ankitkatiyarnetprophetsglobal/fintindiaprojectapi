@@ -10,6 +10,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -21,7 +22,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'phone','role', 'rolelabel', 'role_id', 'password','verified','deviceid','authid','FCMToken','viamedium'
+        'name', 'email', 'phone','role', 'rolelabel', 'role_id', 'password','verified','deviceid','authid','FCMToken','viamedium',
     ];
 
     /**
@@ -108,6 +109,13 @@ class User extends Authenticatable implements JWTSubject
 	}
 
 	 return $result;   
+  }
+  public function getNameAttribute($value){
+    
+    if($value == null){
+        return 'Anonymous';
+    }
+    return $value;
   }
 
   public function verifyUser(){		 

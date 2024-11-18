@@ -592,7 +592,7 @@ class ChallengesController extends Controller
                 ), 200);    
             }
 
-            $data = Userhistorytraking::with(['getMasterGroupDetails'])->where('status', 1)->where('user_id', '=', $request->user_id)->get();    
+            $data = Userhistorytraking::with(['getMasterGroupDetails'])->where('status', 1)->where('user_id', '=', $request->user_id)->take(10)->get();    
             
             if(count($data) > 0){        
                 $error_code = 200;

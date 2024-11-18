@@ -745,6 +745,9 @@ class UserVerify extends Controller
    public function verifyuser(Request $request){		
 	   //dd($request);		
 	   try{ 
+			// return response()->json([			
+			// 'data' => $request->all(),			
+			// ], 200);
 			$iv = "fedcba9876543210"; 
 			$key = "0a9b8c7d6e5f4g3h";
 				
@@ -797,6 +800,12 @@ class UserVerify extends Controller
 			$key = $reqtimevar . 'fitind';
 			$email = $this->decrypt($key, $iv, $request->email);
 
+			// return response()->json([			
+			// 	'data' => $request->all(),			
+			// 	'reqtimevar' => $reqtimevar,			
+			// 	'email' => $email,			
+			// 	'otp' => $otp,			
+			// ], 200);
             //dd($otp);
             //dd($email);
 			
@@ -986,10 +995,16 @@ class UserVerify extends Controller
 
 	// new function 20-04-2023
     public function generateotpvtwo(Request $request){
-		// dd('23322332233223');die;
+		// dd('1111111');
+		
        	try{
 			$iv ="fedcba9876543210";
 			$key="0a9b8c7d6e5f4g3h";
+			// dd($request->reqtime);
+			// return response()->json([
+			// 	'message' => $request->all(),
+			// 	'reqtime' => $request->reqtime,
+			// ], 200);
 
 			if(strpos($request->reqtime, '=') == false){
 				return Response::json(array(
@@ -998,13 +1013,20 @@ class UserVerify extends Controller
 					'message'   =>  'Not valid request'
 				), 422);
 			}
-
-			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);
+			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);			
 			$key = $reqtimevar.'fitind';
-			$email = $this->decrypt($key, $iv, trim($request->email));//email sms send			
+			$email = $this->decrypt($key, $iv, trim($request->email));//email sms send						
 			$email = trim($email);
-			$mobile = $this->decrypt($key, $iv, $request->mobile);//phone number sms send
-			// dd($reqtimevar);
+			$mobile = $this->decrypt($key, $iv, $request->mobile);//phone number sms send	
+			// return response()->json([
+			// 	'response' => $request->all(),
+			// 	'reqtime' => $reqtimevar,
+			// 	'email' => $email,
+			// 	'mobile' => $mobile,
+			// ], 200);
+			// dd("Done");
+			
+			$mobile = $this->decrypt($key, $iv, $request->mobile);//phone number sms send			
 		    $messsages = array(
 					'email.required'=>'Please enter the email.',
 					'email.email'=>'Please enter valid email.',
@@ -1322,7 +1344,8 @@ class UserVerify extends Controller
 
 
 	public function verifyuserthree(Request $request){		
-		// dd($request->all());		
+		// dd($request->all());	
+		
 		try{ 
 			$iv = "fedcba9876543210"; 
 			$key = "0a9b8c7d6e5f4g3h";

@@ -10,6 +10,7 @@ use App\Models\Post;
 use App\Models\PostslLike;
 use App\Models\PostCat;
 use App\Models\PostsComments;
+use App\Models\Posttracking;
 use Exception;
 use JWTAuth;
 use DB;
@@ -48,7 +49,7 @@ class PostsController extends Controller
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
                     }])->where([['published', '=', 2],['status', '=', 1]])
-                    ->paginate(10);    
+                    ->paginate(500);    
 
                 }elseif($lang_slug == 'all'){
                     
@@ -68,7 +69,7 @@ class PostsController extends Controller
                             $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
                         }
                     }
-                    $data_post = $query->paginate(10);
+                    $data_post = $query->paginate(500);
 
                 }elseif($post_category_id == 'all'){
                     
@@ -79,7 +80,7 @@ class PostsController extends Controller
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
                     }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]])                
-                    ->paginate(10);    
+                    ->paginate(500);    
 
                 }else{
                     $query = Post::with('getPostCategorylang')
@@ -95,7 +96,7 @@ class PostsController extends Controller
                             $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
                         }
                     }
-                    $data_post = $query->paginate(10);                  
+                    $data_post = $query->paginate(500);                  
                 
                 }
 
@@ -161,27 +162,24 @@ class PostsController extends Controller
 		}
         
 	}
-    public function showbyid(Request $request){
-        // dd($request->all());        
+    public function showbyid(Request $request){        
         
         try{ 
             $search_id = $request['id'];
-            $user_id = $request['user_id'];
-            // dd($user_id);    
+            $user_id = $request['user_id'];            
             $user = auth('api')->user();
+
             if($user){
                 
                 $error_code = 200;
                 $error_message = null;
-                
-                // $data = Post::paginate(50);
-                // $data = Post::get();
+
                 $datacount = Post::where('id', $search_id)->get();
-                // dd(count($data));
+                
                 if(count($datacount) >0){
 
                     $data = Post::select('id','title','description','image','post_category_wise','video_post','published','created_by')->with(
-                    // $data = Post::with(
+                
                         [
                         'comments'=>function($m){
                             $m->wherecommentStatus(true)->select('id','user_id','comment','post_id','comment_status','created_by','created_at')->where("comment_status","=",1)->take(10);
@@ -205,12 +203,14 @@ class PostsController extends Controller
                         // ->whereLikeStatus(true)->whereUserId($user_id)->select('like_status')
                         ->where('id', $search_id)->where('status','=', 1)
                         ->where('published','=', 2)->orderBy('id', 'DESC')->first();
-                   
-                //    dd($data);
-                   
-                //     $PostslLike = PostslLike::where('post_id', $search_id)->where('like_status','=', 1)->get();
-                //     $PostsComments = PostsComments::where('post_id', $search_id)->where('status','=', 1)->get();
-                //     dd($PostsComments);
+                        
+                    $Posttracking_save = new Posttracking();
+                    $Posttracking_save->user_id = $user_id;
+                    $Posttracking_save->post_id = $search_id;
+                    $Posttracking_save->view = 1;
+                    $Posttracking_save->status = 1;				
+                    $Posttracking_save->save();    
+                
                     return Response::json(array(
                         'isSuccess' => 'true',
                         'code'      => $error_code,
@@ -580,7 +580,7 @@ class PostsController extends Controller
             if($user){
                 
                 $data = PostsComments::select('id','user_id','post_id','comment','created_at')
-                ->with(['user:id,name'])->where([['comment_status', '=', 1],['post_id','=', $request->post_id]])->paginate(10);   
+                ->with(['user:id,name'])->where([['comment_status', '=', 1],['post_id','=', $request->post_id]])->paginate(500);   
                 // dd(count($data));
                 
                 $error_code = 200;                             
