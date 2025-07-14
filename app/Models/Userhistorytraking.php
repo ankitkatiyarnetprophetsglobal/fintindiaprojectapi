@@ -12,7 +12,7 @@ class Userhistorytraking extends Model
 	use HasFactory;
 	protected $table ='userhistorytrakings';
 	public $timestamps = false;
-	
+
 	protected $fillable = [
 		'user_id',
 		'groupid',
@@ -26,10 +26,11 @@ class Userhistorytraking extends Model
 		'duration',
 		'distance',
 		'uom',
+		'carbonSave',
 		'datetime',
 		'location',
 		'status',
-	]; 
+	];
 
 	public function getMasterGroupDetails(){
 		return $this->hasOne(Mastergroupmode::class,'id','modegroupid');

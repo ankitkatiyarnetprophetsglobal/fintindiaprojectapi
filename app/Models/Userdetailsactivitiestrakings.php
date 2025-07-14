@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 class Userdetailsactivitiestrakings extends Model
 {
-    
+
 	use HasFactory;
-	protected $table ='Userdetailsactivitiestrakings';
+	protected $table ='userdetailsactivitiestrakings';
 	public $timestamps = false;
-	
+
 	protected $fillable = [
 		'user_id',
 		'groupid',
@@ -24,8 +24,9 @@ class Userdetailsactivitiestrakings extends Model
 		'distance',
 		'datetime',
 		'location',
+		'carbonSave',
 		'status',
-	]; 
+	];
 
 	public function getLocationAttribute($value)
     {

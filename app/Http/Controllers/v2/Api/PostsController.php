@@ -25,7 +25,7 @@ class PostsController extends Controller
      */
 	public function __construct() {
 
-        $this->middleware('auth:api', ['except' => ['listshow','showbyid','likebyid','postscategory','more_comments_pagewise']]);
+        $this->middleware('auth:api', ['except' => ['listshow','showbyid','likebyid','postscategory','more_comments_pagewise','listcopyshow']]);
     
     } 
 	public function listshow(Request $request){
@@ -49,6 +49,7 @@ class PostsController extends Controller
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
                     }])->where([['published', '=', 2],['status', '=', 1]])
+                    ->orderBy('id', 'DESC')
                     ->paginate(500);    
 
                 }elseif($lang_slug == 'all'){
@@ -59,7 +60,8 @@ class PostsController extends Controller
                     }])
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
-                    }])->where([['published', '=', 2],['status', '=', 1]]);
+                    }])->where([['published', '=', 2],['status', '=', 1]])
+                    ->orderBy('id', 'DESC');
                  
                     foreach(explode(',',$request->post_category_id) as $key => $val){
 
@@ -79,14 +81,16 @@ class PostsController extends Controller
                     }])
                     ->withCount(['like' => function($q) use($user_id){
                         $q->whereLikeStatus(true);                    
-                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]])                
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]]) 
+                    ->orderBy('id', 'DESC')               
                     ->paginate(500);    
 
                 }else{
                     $query = Post::with('getPostCategorylang')
                         ->withCount(['like' => function($q){
                         $q->whereLikeStatus(true);
-                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]]);
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]])
+                    ->orderBy('id', 'DESC');
                  
                     foreach(explode(',',$request->post_category_id) as $key => $val){
 
@@ -319,13 +323,30 @@ class PostsController extends Controller
                 $error_message = null;
                 
                 // $Userdetailsactitrak = new PostslLike();
-                $Userdetailsactitrak = PostslLike::updateOrCreate(['user_id' =>  $user_id], ['post_id' => $post_id]);
-                $Userdetailsactitrak->user_id = $user_id;
-                $Userdetailsactitrak->post_id = $post_id;
-                $Userdetailsactitrak->like_status = $like_status;                                        
-                $Userdetailsactitrak->save();
+                // $Userdetailsactitrak = PostslLike::updateOrCreate(['user_id' =>  $user_id], ['post_id' => $post_id]);
+                // $Userdetailsactitrak->user_id = $user_id;
+                // $Userdetailsactitrak->post_id = $post_id;
+                // $Userdetailsactitrak->like_status = $like_status;                                        
+                // $Userdetailsactitrak->save();
+                $post_data = PostslLike::                                                                              
+                                        where([                                            
+                                                ['user_id','=' , $user_id],                                                
+                                                ['post_id','=' , $post_id],                                                
+                                            ])                                        
+                                        ->get(); 
+                if(count($post_data) > 0){
+                    // dd($post_data[0]['id']);
+                    $update_transfer_status = PostslLike::where('id', $post_data[0]['id'])->update(['like_status' => $like_status]);
 
-
+                }else{
+                    $Userdetailsactitrak = new PostslLike();
+                    // $Userdetailsactitrak = PostslLike::updateOrCreate(['user_id' =>  $user_id], ['post_id' => $post_id]);
+                    $Userdetailsactitrak->user_id = $user_id;
+                    $Userdetailsactitrak->post_id = $post_id;
+                    $Userdetailsactitrak->like_status = $like_status;                                        
+                    $Userdetailsactitrak->save();
+                }
+                // dd($post_data['id']);
                 // $data = Post::paginate(50);
                 // $data = Post::get();
                 // $data = Post::where('id', $post_id)->get();
@@ -639,5 +660,143 @@ class PostsController extends Controller
             }
 		}
     }
+    public function listcopyshow(Request $request){
+
+        // dd($request->all());
+        $user = auth('api')->user();
+        try{ 
+            if($user){
+                
+                $PostCat_data = PostCat::select('id','name','image')->where('status', '=', 1)->orderBy('name', 'ASC')->get();   
+                $post_category_id = $request->post_category_id;
+                $lang_slug = $request->lang_slug;
+                $user_id = $request->user_id;
+                
+                if($post_category_id == 'all' && $lang_slug == 'all'){
+                    //  dd($user_id);                   
+                    $data_post = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
+                        $q->whereUserId($user_id)->select('user_id','post_id','like_status');
+                        // $q->whereLikeStatus(true);                    
+                    }])
+                    ->withCount(['like' => function($q) use($user_id){
+                        $q->whereLikeStatus(true);                    
+                    }])->where([['published', '=', 2],['status', '=', 1]])
+                    ->orderBy('id', 'DESC')
+                    ->paginate(10);    
+
+                }elseif($lang_slug == 'all'){
+                    
+                    $query = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
+                        $q->whereUserId($user_id)->select('user_id','post_id','like_status');
+                        // $q->whereLikeStatus(true);                    
+                    }])
+                    ->withCount(['like' => function($q) use($user_id){
+                        $q->whereLikeStatus(true);                    
+                    }])->where([['published', '=', 2],['status', '=', 1]])
+                    ->orderBy('id', 'DESC');
+                 
+                    foreach(explode(',',$request->post_category_id) as $key => $val){
+
+                        if($key == 0){
+                            $query = $query->whereRaw('FIND_IN_SET(?, post_category)', [$val]);
+                        }else{
+                            $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
+                        }
+                    }
+                    $data_post = $query->paginate(10);
+
+                }elseif($post_category_id == 'all'){
+                    
+                    $data_post = Post::with('getPostCategorylang')->with(['like' => function($q) use($user_id){
+                        $q->whereUserId($user_id)->select('user_id','post_id','like_status');
+                        // $q->whereLikeStatus(true);                    
+                    }])
+                    ->withCount(['like' => function($q) use($user_id){
+                        $q->whereLikeStatus(true);                    
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]]) 
+                    ->orderBy('id', 'DESC')               
+                    ->paginate(10);    
+
+                }else{
+                    $query = Post::with('getPostCategorylang')
+                        ->withCount(['like' => function($q){
+                        $q->whereLikeStatus(true);
+                    }])->where([['published', '=', 2],['lang_slug',$lang_slug],['status', '=', 1]])
+                    ->orderBy('id', 'DESC');
+                 
+                    foreach(explode(',',$request->post_category_id) as $key => $val){
+
+                        if($key == 0){
+                            $query = $query->whereRaw('FIND_IN_SET(?, post_category)', [$val]);
+                        }else{
+                            $query = $query->orWhereRaw('FIND_IN_SET(?, post_category)', [$val]);  
+                        }
+                    }
+                    $data_post = $query->paginate(10);                  
+                
+                }
+
+                $a1=array( 'PostCat_data' => $PostCat_data);
+                $a2=array("data_post" => $data_post);
+                
+                $data =array_merge($a1,$a2);
+                
+                $error_code = 200;                             
+                
+                if(count($data) >0){
+
+                    $error_message = null;   
+                    
+                    return Response::json(array(
+                        'isSuccess' => 'true',
+                        'code'      => $error_code,
+                        'data'      => $data,
+                        'message'   => $error_message
+                    ), 200);
+
+                }else{
+
+                    $error_message = "Data Not Found";
+                    $error_code = '201';
+                    return Response::json(array(
+                        'isSuccess' => 'false',
+                        'code'      => $error_code,
+                        'data'      => "",
+                        'message'   => $error_message
+                    ), 200);                  
+                }
+
+            }else{
+            
+                return Response::json(array(
+                    'status'    => 'error',
+                    'code'      =>  801,
+                    'message'   =>  'Unauthorized'
+                ), 401);
+                
+            }
+            
+        } catch(Exception $e) { 
+            
+            $controller_name = 'PostsController';
+            $function_name = 'listshow';   
+            $error_code = '901';
+            $error_message = $e->getMessage();
+            $send_payload = json_encode($request->all());
+            $response = null;            
+            // $var = Helper::saverrorlogs($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);3
+            $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+            
+            if(empty($request->Location)){
+                return Response::json(array(
+                    'isSuccess' => 'false',
+                    'code'      => $error_code,
+                    'data'      => null,
+                    'message'   => $error_message
+                ), 200);
+            }
+		}
+        
+	}
 
 }

@@ -97,11 +97,13 @@ class SleepController extends Controller
 				//$sleep = Sleep::where( 'user_id', $request->user_id )->whereBetween( 'created_at', [$startdate, $enddate] )->get();
 				$sleep = DB::table('sleep')->select(DB::raw("sleep.id, sleep.user_id, bed_date, bed_time, wakup_date, wakup_time, sleep_hours, goal_achieve ,goal, DATE_FORMAT(sleep.created_at,'%Y/%m/%d') as created_at" ))
 						 ->where( 'sleep.user_id', $user->id )->whereBetween( 'sleep.created_at', [$startdate, $enddate] )
+                         ->orderBy('sleep.id', 'desc')->take(30)
 						 ->get();
 			}else{
 				//$sleep = Sleep::select('id', 'user_id', 'bed_date', 'bed_time', 'wakup_date', 'wakup_time', 'sleep_hours', 'goal_achieve', 'created_at')->where('user_id',$request->user_id)->get();
 				$sleep = DB::table('sleep')->select(DB::raw("sleep.id, sleep.user_id, bed_date, bed_time, wakup_date, wakup_time, sleep_hours, goal_achieve ,goal, DATE_FORMAT(sleep.created_at,'%Y/%m/%d') as created_at" ))
 						 ->where('sleep.user_id',$user->id)
+                         ->orderBy('sleep.id', 'desc')->take(30)
 						 //->where('user_goals.type','=','sleep')
 						 ->get(); 
 			}

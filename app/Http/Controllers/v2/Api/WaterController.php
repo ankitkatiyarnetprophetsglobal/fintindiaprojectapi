@@ -91,7 +91,8 @@ class WaterController extends Controller
 					$datevar = date( "Y-m-d", strtotime($request->created_on) );
 					$water = DB::table('waters')
 							->select( DB::raw("id, user_id, quantity, goal, weekly_completion, DATE_FORMAT( for_date, '%Y/%m/%d' ) as for_date" )  )
-							->where('user_id',$user->id)->where( 'for_date', $datevar )
+							->where('user_id',$user->id)->where( 'for_date', $datevar)
+                            ->orderBy('id', 'desc')->take(30)
 							->get();
 				
 				
@@ -105,6 +106,7 @@ class WaterController extends Controller
 				$water = DB::table('waters')
 							->select( DB::raw("id, user_id, quantity, goal, weekly_completion, DATE_FORMAT( for_date,'%Y/%m/%d' ) as for_date ") )
 							->where('user_id',$user->id)
+                            ->orderBy('id', 'desc')->take(30)
 							->get();
 							 
 				return Response::json(array(
