@@ -381,7 +381,7 @@ class SocweekendeventController extends Controller
                 if($cycle_check == 0 && $t_shirt_check == 0 && $meal_check == 0){
 
                     $error_code = '801';
-                    $error_message = 'Please select at-lest one item from Cycle/ Refreshment/ T-Shirt';
+                    $error_message = 'Please select at lest one item to book Cycle or Meal or T Shirt';
 
                     return Response::json(array(
                         'isSuccess' => 'false',
@@ -472,7 +472,7 @@ class SocweekendeventController extends Controller
                 if($meal_check == 1){
                     if($master_meal_count == 0){
                         $error_code = '801';
-                        $error_message = "Refreshment booking is currently unavailable.";
+                        $error_message = "Meal booking is currently unavailable.";
 
                         return Response::json(array(
                             'isSuccess' => 'false',
@@ -1179,7 +1179,7 @@ class SocweekendeventController extends Controller
                                                 'isSuccess' => 'true',
                                                 'code'      => 200,
                                                 'data'      => null,
-                                                'message'   => 'T-Shirt Issued'
+                                                'message'   => 'T shirt Issued'
                                             ), 200);
                         }
                     }
@@ -1206,7 +1206,7 @@ class SocweekendeventController extends Controller
                                                 'isSuccess' => 'true',
                                                 'code'      => 200,
                                                 'data'      => null,
-                                                'message'   => 'Refreshment Issued'
+                                                'message'   => 'Meal Issued'
                                             ), 200);
                         }
 
@@ -1243,7 +1243,7 @@ class SocweekendeventController extends Controller
                         $datareceivestore->tshart_admin_user_id = $tshart_admin_user_id;
                     }
 
-                    $message = "T-Shirt Issued";
+                    $message = "T shirt Issued";
                 }
 
                 if($meal_check == 1){
@@ -1257,7 +1257,7 @@ class SocweekendeventController extends Controller
                         $datareceivestore->meal_admin_user_id = $meal_admin_user_id;
                     }
 
-                    $message = "Refreshment Issued";
+                    $message = "Meal Issued";
                 }
 
                 $datareceivestore->latitude = $latitude;
@@ -1344,31 +1344,15 @@ class SocweekendeventController extends Controller
                 //     ), 200);
                 // }
 
-                // $data = Soceventparticipation::
-                //             where([
-                //                     ['soc_event_participations.status','=' , 1],
-                //                     ['soc_event_participations.socemid','=' , $socemid],
-                //                 ])
-                //             // ->whereDate('event_date', $event_date)
-                //             ->select('id','cycle_waiting','tshirt_waiting','meal_waiting')
-                //             ->orderBy('soc_event_participations.id', 'DESC')
-                //             ->first();
-
                 $data = Soceventparticipation::
-                            selectRaw("
-                                MAX(CAST(SUBSTRING(cycle_waiting, LENGTH('Waiting Id:- ') + 1) AS UNSIGNED)) AS cycle_waiting,
-                                MAX(CAST(SUBSTRING(cycle_booking, LENGTH('Booking Id:- ') + 1) AS UNSIGNED)) AS cycle_booking,
-                                MAX(CAST(SUBSTRING(tshirt_waiting, LENGTH('Waiting Id:- ') + 1) AS UNSIGNED)) AS tshirt_waiting,
-                                MAX(CAST(SUBSTRING(tshart_booking, LENGTH('Booking Id:- ') + 1) AS UNSIGNED)) AS tshart_booking,
-                                MAX(CAST(SUBSTRING(meal_booking, LENGTH('Booking Id:- ') + 1) AS UNSIGNED)) AS meal_booking,
-                                MAX(CAST(SUBSTRING(meal_waiting, LENGTH('Waiting Id:- ') + 1) AS UNSIGNED)) AS meal_waiting
-                            ")
-                            ->where([
+                            where([
                                     ['soc_event_participations.status','=' , 1],
                                     ['soc_event_participations.socemid','=' , $socemid],
                                 ])
+                            // ->whereDate('event_date', $event_date)
+                            ->select('id','cycle_waiting','tshirt_waiting','meal_waiting')
+                            ->orderBy('soc_event_participations.id', 'DESC')
                             ->first();
-
                 // dd($data);
                 if (isset($data)){
                 // if($data->count() > 0){
@@ -1592,7 +1576,7 @@ class SocweekendeventController extends Controller
                             'code'      =>  200,
                             'message_cycle'   =>  "Cycle Already Issued",
                             'message_tshirt'   =>  "T-shirt Already Issued",
-                            'message_meal'   =>  "Refreshment Already Issued",
+                            'message_meal'   =>  "Meal Already Issued",
                             'message'   =>  null,
                             'data'      => $data
                         ), 200);
@@ -1699,9 +1683,9 @@ class SocweekendeventController extends Controller
                         if($cycle_check_value == 1){
 
                             if($cycle_check_value == 1 && $cycle_value == 1){
-                                $meassage_show = "Proceed to allot a cycle — booking verified.";
+                                $meassage_show = "You don't request for a Cycle in booking.";
                             }else{
-                                $meassage_show = "You are on the waitlist for cycle allotment";
+                                $meassage_show = "User don't request for a Cycle in booking.";
                             }
 
                         }
@@ -1709,10 +1693,9 @@ class SocweekendeventController extends Controller
                         if($tshirt_check_value == 1){
 
                             if($tshirt_check_value == 1 && $tshirt_value == 1){
-                                $meassage_show = "Proceed to allot a T-Shirt — booking verified.";
-                                // $meassage_show = "You need to select T-Shirt while booking";
+                                $meassage_show = "You don't request for a T-Shirt in booking.";
                             }else{
-                                $meassage_show = "You are on the waitlist for T-Shirt allotment";
+                                $meassage_show = "User don't request for a T-Shirt in booking.";
                             }
 
                         }
@@ -1720,10 +1703,9 @@ class SocweekendeventController extends Controller
                         if($meal_check_value == 1){
 
                             if($meal_check_value == 1 && $meal_value == 1){
-                                $meassage_show = "Proceed to allot a refreshment — booking verified.";
-                                // $meassage_show = "You need to select refreshment while booking";
+                                $meassage_show = "You don't request for a Meal in booking.";
                             }else{
-                                $meassage_show = "You are on the waitlist for refreshment allotment";
+                                $meassage_show = "User don't request for a Meal in booking.";
                             }
 
                         }
@@ -1951,7 +1933,7 @@ class SocweekendeventController extends Controller
                         }else{
 
                             $error_code = '801';
-                            $error_message = 'Cycle is already returned';
+                            $error_message = 'User already return cycle';
 
                             return Response::json(array(
                                 'isSuccess' => 'false',
@@ -1966,7 +1948,7 @@ class SocweekendeventController extends Controller
                         return Response::json(array(
                             'status'    => 'error',
                             'code'      =>  200,
-                            'message'   =>  'Cycle has not been allotted',
+                            'message'   =>  'Cycle Not Allotted',
                             'data'   => null,
                         ), 401);
 
@@ -2031,18 +2013,18 @@ class SocweekendeventController extends Controller
                         ), 200);
                     }
 
-                    // if($cycle_check == null || $cycle_check == ''){
+                    if($cycle_check == null || $cycle_check == ''){
 
-                    //     $error_code = '801';
-                    //     $error_message = 'Required soc cycle check';
+                        $error_code = '801';
+                        $error_message = 'Required soc cycle check';
 
-                    //     return Response::json(array(
-                    //         'isSuccess' => 'false',
-                    //         'code'      => $error_code,
-                    //         'data'      => null,
-                    //         'message'   => $error_message
-                    //     ), 200);
-                    // }
+                        return Response::json(array(
+                            'isSuccess' => 'false',
+                            'code'      => $error_code,
+                            'data'      => null,
+                            'message'   => $error_message
+                        ), 200);
+                    }
 
 
                     if($user_id == null || $user_id == ''){
@@ -2066,16 +2048,16 @@ class SocweekendeventController extends Controller
                                                                 ])
                                                                 ->select('id','cycle','cycle_return')
                                                                 ->first();
-                    // dd($data);
+
                     if (isset($data)){
-                        // dd($data['cycle_return']);
-                        if($data['cycle_return'] == $data['cycle']){
+
+                        if($data['cycle_return'] == $data['cycle']) {
 
                             return Response::json(array(
                                     'isSuccess' => 'true',
                                     'code'      => 200,
                                     'data'      => 1,
-                                    'message'   => 'Cycling complete. Participant is eligible for refreshments.'
+                                    'message'   => 'Refreshments can be offered to the users.'
                             ), 200);
                         }
 
@@ -2085,7 +2067,7 @@ class SocweekendeventController extends Controller
                                     'isSuccess' => 'true',
                                     'code'      => 200,
                                     'data'      => 0,
-                                    'message'   => 'Cannot provide refreshments — Cycle return is incomplete.'
+                                    'message'   => 'Cycle not returned. Refreshments cannot be provided to the users.'
                             ), 200);
                         }
 
@@ -2095,7 +2077,7 @@ class SocweekendeventController extends Controller
                                     'isSuccess' => 'true',
                                     'code'      => 200,
                                     'data'      => 2,
-                                    'message'   => 'Cycle already returned'
+                                    'message'   => 'user already return cycle'
                             ), 200);
                         }
 
@@ -2104,10 +2086,9 @@ class SocweekendeventController extends Controller
                         return Response::json(array(
                             'status'    => 'error',
                             'code'      =>  200,
-                            'data'      => 3,
                             'message'   =>  'Data not found',
-                            // 'data'   => null,
-                        ), 200);
+                            'data'   => null,
+                        ), 401);
 
                     }
 
@@ -2168,26 +2149,18 @@ class SocweekendeventController extends Controller
                         ), 200);
                     }
 
-                    // $data = Soceventparticipationreceive::where([
-                    //                                             ['socemid','=' , $event_master_id],
-                    //                                             ['status','=',1]
-                    //                                         ])
-                    //                                             ->select(
-                    //                                                 'id',
-                    //                                                 DB::raw('CAST(IFNULL((SUM(cycle)), 0) AS SIGNED) AS giving_cycle'),
-                    //                                                 DB::raw('CAST(IFNULL((SUM(cycle_return)), 0) AS SIGNED) AS return_cycle'),
-                    //                                             )
-                    //                                             ->groupBy('id','cycle')
-                    //                                             // ->groupBy('id','cycle','cycle_return')
-                    //                                             ->first();
-
-                    $data = Soceventparticipationreceive::
-                        selectRaw('SUM(cycle) as giving_cycle, SUM(cycle_return) as return_cycle')
-                        ->where('socemid', $event_master_id)
-                        // ->where('socemid', 3)
-                        ->where('status', 1)
-                        ->first();
-                    // dd($data);
+                    $data = Soceventparticipationreceive::where([
+                                                                ['socemid','=' , $event_master_id],
+                                                                ['status','=',1]
+                                                            ])
+                                                                ->select(
+                                                                    'id',
+                                                                    DB::raw('CAST(IFNULL((SUM(cycle)), 0) AS SIGNED) AS giving_cycle'),
+                                                                    DB::raw('CAST(IFNULL((SUM(cycle_return)), 0) AS SIGNED) AS return_cycle'),
+                                                                )
+                                                                ->groupBy('id','cycle','cycle_return')
+                                                                ->first();
+                    dd($data);
 
                     if (isset($data)){
 
@@ -2244,6 +2217,8 @@ class SocweekendeventController extends Controller
             }
         }
     }
+
+
 
     public function get_slot_time(Request $request){
 

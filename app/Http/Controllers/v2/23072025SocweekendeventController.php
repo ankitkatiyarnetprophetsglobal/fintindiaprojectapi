@@ -381,7 +381,7 @@ class SocweekendeventController extends Controller
                 if($cycle_check == 0 && $t_shirt_check == 0 && $meal_check == 0){
 
                     $error_code = '801';
-                    $error_message = 'Please select at-lest one item from Cycle/ Refreshment/ T-Shirt';
+                    $error_message = 'Please select at lest one item to book Cycle or Refreshment or T Shirt';
 
                     return Response::json(array(
                         'isSuccess' => 'false',
@@ -1179,7 +1179,7 @@ class SocweekendeventController extends Controller
                                                 'isSuccess' => 'true',
                                                 'code'      => 200,
                                                 'data'      => null,
-                                                'message'   => 'T-Shirt Issued'
+                                                'message'   => 'T shirt Issued'
                                             ), 200);
                         }
                     }
@@ -1206,7 +1206,7 @@ class SocweekendeventController extends Controller
                                                 'isSuccess' => 'true',
                                                 'code'      => 200,
                                                 'data'      => null,
-                                                'message'   => 'Refreshment Issued'
+                                                'message'   => 'Meal Issued'
                                             ), 200);
                         }
 
@@ -1243,7 +1243,7 @@ class SocweekendeventController extends Controller
                         $datareceivestore->tshart_admin_user_id = $tshart_admin_user_id;
                     }
 
-                    $message = "T-Shirt Issued";
+                    $message = "T shirt Issued";
                 }
 
                 if($meal_check == 1){
@@ -1257,7 +1257,7 @@ class SocweekendeventController extends Controller
                         $datareceivestore->meal_admin_user_id = $meal_admin_user_id;
                     }
 
-                    $message = "Refreshment Issued";
+                    $message = "Meal Issued";
                 }
 
                 $datareceivestore->latitude = $latitude;
@@ -1699,9 +1699,9 @@ class SocweekendeventController extends Controller
                         if($cycle_check_value == 1){
 
                             if($cycle_check_value == 1 && $cycle_value == 1){
-                                $meassage_show = "Proceed to allot a cycle — booking verified.";
+                                $meassage_show = "You don't request for a Cycle in booking.";
                             }else{
-                                $meassage_show = "You are on the waitlist for cycle allotment";
+                                $meassage_show = "User don't request for a Cycle in booking.";
                             }
 
                         }
@@ -1709,10 +1709,9 @@ class SocweekendeventController extends Controller
                         if($tshirt_check_value == 1){
 
                             if($tshirt_check_value == 1 && $tshirt_value == 1){
-                                $meassage_show = "Proceed to allot a T-Shirt — booking verified.";
-                                // $meassage_show = "You need to select T-Shirt while booking";
+                                $meassage_show = "You don't request for a T-Shirt in booking.";
                             }else{
-                                $meassage_show = "You are on the waitlist for T-Shirt allotment";
+                                $meassage_show = "User don't request for a T-Shirt in booking.";
                             }
 
                         }
@@ -1720,10 +1719,9 @@ class SocweekendeventController extends Controller
                         if($meal_check_value == 1){
 
                             if($meal_check_value == 1 && $meal_value == 1){
-                                $meassage_show = "Proceed to allot a refreshment — booking verified.";
-                                // $meassage_show = "You need to select refreshment while booking";
+                                $meassage_show = "You don't request for a refreshment in booking.";
                             }else{
-                                $meassage_show = "You are on the waitlist for refreshment allotment";
+                                $meassage_show = "User don't request for a refreshment in booking.";
                             }
 
                         }
@@ -1951,7 +1949,7 @@ class SocweekendeventController extends Controller
                         }else{
 
                             $error_code = '801';
-                            $error_message = 'Cycle is already returned';
+                            $error_message = 'User already return cycle';
 
                             return Response::json(array(
                                 'isSuccess' => 'false',
@@ -1966,7 +1964,7 @@ class SocweekendeventController extends Controller
                         return Response::json(array(
                             'status'    => 'error',
                             'code'      =>  200,
-                            'message'   =>  'Cycle has not been allotted',
+                            'message'   =>  'Cycle Not Allotted',
                             'data'   => null,
                         ), 401);
 
@@ -2008,7 +2006,7 @@ class SocweekendeventController extends Controller
     public function post_soc_return_equipment_status(Request $request){
 
          try{
-
+            
             $user = auth('api')->user();
 
             if($user){
@@ -2075,7 +2073,7 @@ class SocweekendeventController extends Controller
                                     'isSuccess' => 'true',
                                     'code'      => 200,
                                     'data'      => 1,
-                                    'message'   => 'Cycling complete. Participant is eligible for refreshments.'
+                                    'message'   => 'Refreshments can be offered to the users.'
                             ), 200);
                         }
 
@@ -2085,7 +2083,7 @@ class SocweekendeventController extends Controller
                                     'isSuccess' => 'true',
                                     'code'      => 200,
                                     'data'      => 0,
-                                    'message'   => 'Cannot provide refreshments — Cycle return is incomplete.'
+                                    'message'   => 'Cycle not returned. Refreshments cannot be provided to the users.'
                             ), 200);
                         }
 
@@ -2095,12 +2093,12 @@ class SocweekendeventController extends Controller
                                     'isSuccess' => 'true',
                                     'code'      => 200,
                                     'data'      => 2,
-                                    'message'   => 'Cycle already returned'
+                                    'message'   => 'user already return cycle'
                             ), 200);
                         }
 
                     }else{
-
+                        
                         return Response::json(array(
                             'status'    => 'error',
                             'code'      =>  200,
@@ -2244,6 +2242,8 @@ class SocweekendeventController extends Controller
             }
         }
     }
+
+
 
     public function get_slot_time(Request $request){
 

@@ -381,7 +381,11 @@ Route::prefix('v2')->group(function(){
     Route::POST('get-status-notgiving-user',[App\Http\Controllers\v2\SocweekendeventController::class,'get_status_notgiving_user']);
     Route::POST('soc-return-equipment',[App\Http\Controllers\v2\SocweekendeventController::class,'post_soc_return_equipment']);
     Route::POST('soc-return-equipment-status',[App\Http\Controllers\v2\SocweekendeventController::class,'post_soc_return_equipment_status']);
-    Route::POST('soc-allotment-return-status',[App\Http\Controllers\v2\SocweekendeventController::class,'socallotment_return_status']);
+    Route::POST('soc-allotment-return-status',[App\Http\Controllers\v2\SocweekendeventController::class,'soc_allotment_return_status']);
+    Route::POST('get-slot-time-status',[App\Http\Controllers\v2\SocweekendeventController::class,'get_slot_time']);
+
+    Route::POST('save-datewise-soc-v1',[App\Http\Controllers\v2\Socweekendeventv1Controller::class,'save_datewise_soc_v1']);
+    Route::POST('save-datewise-receive-soc-v1',[App\Http\Controllers\v2\Socweekendeventv1Controller::class,'save_datewise_receive_soc_v1']);
 
     Route::GET('useremail',[App\Http\Controllers\v2\QuizcategoriesController::class,'useremail']);
 
