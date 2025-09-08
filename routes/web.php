@@ -23,5 +23,6 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', function () {    return view('servicewelcome'); });
 Route::get('/test/', [App\Http\Controllers\HomeController::class, 'checkemail']);
+Route::view('socbookingterms','socbookingterms');
 
 URL::forceScheme('https');

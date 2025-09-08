@@ -130,9 +130,12 @@ class SocweekendeventController extends Controller
                             'sem.cycle',
                             'sem.t_shirt',
                             'sem.meal',
-                            DB::raw('CAST(IFNULL((sem.cycle - SUM(sep.cycle)), 0) AS SIGNED) AS remaining_cycle'),
-                            DB::raw('CAST(IFNULL((sem.t_shirt - SUM(sep.t_shirt)), 0) AS SIGNED) AS remaining_tshirt'),
-                            DB::raw('CAST(IFNULL((sem.meal - SUM(sep.meal)), 0) AS SIGNED) AS remaining_meal'),
+                            // DB::raw('CAST(IFNULL((sem.cycle - SUM(sep.cycle)), 0) AS SIGNED) AS remaining_cycle'),
+                            // DB::raw('CAST(IFNULL((sem.t_shirt - SUM(sep.t_shirt)), 0) AS SIGNED) AS remaining_tshirt'),
+                            // DB::raw('CAST(IFNULL((sem.meal - SUM(sep.meal)), 0) AS SIGNED) AS remaining_meal'),
+                            DB::raw('CAST(GREATEST(1, IFNULL((sem.cycle - SUM(sep.cycle)), sem.cycle)) AS SIGNED) AS remaining_cycle'),
+                            DB::raw('CAST(GREATEST(1, IFNULL((sem.t_shirt - SUM(sep.t_shirt)), sem.t_shirt)) AS SIGNED) AS remaining_tshirt'),
+                            DB::raw('CAST(GREATEST(1, IFNULL((sem.meal - SUM(sep.meal)), sem.meal)) AS SIGNED) AS remaining_meal')
                         )
 
                         ->where([
@@ -152,9 +155,12 @@ class SocweekendeventController extends Controller
                                 'sem.cycle',
                                 'sem.t_shirt',
                                 'sem.meal',
-                                DB::raw('CAST(IFNULL((sem.cycle - SUM(sep.cycle)), 0) AS SIGNED) AS remaining_cycle'),
-                                DB::raw('CAST(IFNULL((sem.t_shirt - SUM(sep.t_shirt)), 0) AS SIGNED) AS remaining_tshirt'),
-                                DB::raw('CAST(IFNULL((sem.meal - SUM(sep.meal)), 0) AS SIGNED) AS remaining_meal'),
+                                // DB::raw('CAST(IFNULL((sem.cycle - SUM(sep.cycle)), 0) AS SIGNED) AS remaining_cycle'),
+                                // DB::raw('CAST(IFNULL((sem.t_shirt - SUM(sep.t_shirt)), 0) AS SIGNED) AS remaining_tshirt'),
+                                // DB::raw('CAST(IFNULL((sem.meal - SUM(sep.meal)), 0) AS SIGNED) AS remaining_meal'),
+                                DB::raw('CAST(GREATEST(1, IFNULL((sem.cycle - SUM(sep.cycle)), sem.cycle)) AS SIGNED) AS remaining_cycle'),
+        DB::raw('CAST(GREATEST(1, IFNULL((sem.t_shirt - SUM(sep.t_shirt)), sem.t_shirt)) AS SIGNED) AS remaining_tshirt'),
+        DB::raw('CAST(GREATEST(1, IFNULL((sem.meal - SUM(sep.meal)), sem.meal)) AS SIGNED) AS remaining_meal')
                             )
                             ->whereDate('sem.event_date', $event_date)
                             ->where([

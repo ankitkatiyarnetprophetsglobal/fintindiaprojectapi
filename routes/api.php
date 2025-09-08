@@ -153,6 +153,10 @@ Route::prefix('v2')->group(function(){
 	Route::post('user/login', [App\Http\Controllers\v2\Api\UserController::class,'login']);
 	Route::post('user/emaillogin', [App\Http\Controllers\v2\Api\UserController::class,'elogin']);
 	Route::post('user/mobilelogin', [App\Http\Controllers\v2\Api\UserController::class,'mlogin']);
+	Route::post('user/getuseremail', [App\Http\Controllers\v2\Api\UserController::class,'useremail']);
+	Route::post('Signup', [App\Http\Controllers\v2\Api\UserController::class,'signupdotnet'])->name('signupdotnet');
+    Route::post('RefNo', [App\Http\Controllers\v2\Api\UserController::class, 'refnodotnet'])->name('refnodotnet');
+
 
 	//Route::group(['middleware' => 'auth'], function () {
 
@@ -277,6 +281,7 @@ Route::prefix('v2')->group(function(){
 	Route::post('step/get_unique_steps', [App\Http\Controllers\v2\Api\StepController::class,'getUniqueSteps']);
 	Route::post('generate_otp', [App\Http\Controllers\v2\Api\UserVerify::class, 'generateotp']);
 	Route::post('generateotpvtwo', [App\Http\Controllers\v2\Api\UserVerify::class, 'generateotpvtwo']);
+	Route::post('generateotpvthree', [App\Http\Controllers\v2\Api\UserVerify::class, 'generateotpv3']);
 	Route::get('send_generate_otp/{first}/{secound}', [App\Http\Controllers\v2\Api\UserVerify::class, 'sendsms']);
 
 	//

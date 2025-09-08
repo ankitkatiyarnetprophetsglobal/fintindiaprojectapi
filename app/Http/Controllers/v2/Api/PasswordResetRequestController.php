@@ -12,30 +12,31 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Models\OtpTrack;
 
-class PasswordResetRequestController extends Controller{ 
+class PasswordResetRequestController extends Controller{
 
-	private $OPENSSL_CIPHER_NAME = "aes-128-cbc"; //Name of OpenSSL Cipher 
-    private $CIPHER_KEY_LEN = 16; 
-	
+	private $OPENSSL_CIPHER_NAME = "aes-128-cbc"; //Name of OpenSSL Cipher
+    private $CIPHER_KEY_LEN = 16;
+
 	function decrypt($key, $iv, $data) {
         if (strlen($key) < $this->CIPHER_KEY_LEN) {
-            $key = str_pad("$key", $this->CIPHER_KEY_LEN, "0"); 
+            $key = str_pad("$key", $this->CIPHER_KEY_LEN, "0");
         } else if (strlen($key) > $this->CIPHER_KEY_LEN) {
-            $key = substr($str, 0, $this->CIPHER_KEY_LEN); 
+            $key = substr($str, 0, $this->CIPHER_KEY_LEN);
         }
-       
+
         $decryptedData = openssl_decrypt( base64_decode($data), $this->OPENSSL_CIPHER_NAME, $key, OPENSSL_RAW_DATA, $iv);
         return $decryptedData;
     }
-	
+
     public function sendEmail(Request $request){
-		
-		
-		
-		try{ 
-			$iv = "fedcba9876543210"; 
+
+
+
+		try{
+            // dd(1313131);
+			$iv = "fedcba9876543210";
 			$key = "0a9b8c7d6e5f4g3h";
-				
+
 				if (strpos($request->reqtime, '=') == false) {
 					return Response::json(array(
 						'status'    => 'error',
@@ -43,7 +44,7 @@ class PasswordResetRequestController extends Controller{
 						'message'   =>  'Not valid request'
 					), 422);
 				}
-			/*	
+			/*
 				if (strpos($request->rcaptcha, '=') == false) {
 					return Response::json(array(
 						'status'    => 'error',
@@ -51,7 +52,7 @@ class PasswordResetRequestController extends Controller{
 						'message'   =>  'Not valid request'
 					), 422);
 				}
-				
+
 				if(empty($request->captcha)) {
 					return Response::json(array(
 						'status'    => 'error',
@@ -59,11 +60,11 @@ class PasswordResetRequestController extends Controller{
 						'message'   =>  'Captcha Required'
 					), 422);
 				}
-			*/	
-				 
+			*/
+
 			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);
 			//$rcaptchavar = $this->decrypt($key, $iv, $request->rcaptcha);
-			
+
 			/*
 				if($request->captcha != $rcaptchavar) {
 					return Response::json(array(
@@ -72,25 +73,27 @@ class PasswordResetRequestController extends Controller{
 						'message'   =>  'Invalid Captcha'
 					), 422);
 				}
-			*/	
-			
+			*/
+
 			$key = $reqtimevar . 'fitind';
-			$email = $this->decrypt($key, $iv, $request->email);
-			
-			
-			
+			// $email = $this->decrypt($key, $iv, $request->email);
+			$email = $request->email;
+            // echo $email; exit;
+
+
 			$validator = Validator::make(array("email" => $email), [
 				'email' => 'required|email',
 			]);
-		
-		
+
+
 			/*
 			$validator = Validator::make($request->all(), [
 				'email' => 'required|email',
 			]);
 			*/
-		
+
 			if ($validator->fails()) {
+
 				return Response::json(array(
 					'success' => false,
 					'status'    => 'error',
@@ -100,103 +103,103 @@ class PasswordResetRequestController extends Controller{
 			}
 
 
-			
-		
+
+
 			$userverf = User::where('email', $email)->first();
-		
+
 			if(!empty($userverf)){
 				$otp = mt_rand(100000,999999);
 				$otptoken = mt_rand(100000,999999);
-				
+
 				$start = date( "Y-m-d 00:00:00");
 				$end = date( "Y-m-d 23:59:59");
-				
+
 				$otpcnt = OtpTrack::where('email', $email)->where('type','password')->whereBetween('created_at',[$start,$end])->count();
-				//print_r($otpcnt); 
-				
-				if($otpcnt > 2){				
+				//print_r($otpcnt);
+
+				if($otpcnt > 2){
 					return Response::json(array(
 							'status'    => 'error',
 							'code'      =>  401,
 							'message'   =>  'Your request limit exceeds'
 						), 401);
 				}
-				
+
 				$passverf = DB::table('userpassverification')->where('email', $email)->first();
-				
+
 				if( empty($passverf) ){
-					
+
 					$passverfotp = DB::table('userpassverification')->insert( ['email'=> $email, 'otp'=> $otp, 'otptoken'=> $otptoken] );
 					if($passverfotp){
-					
-						
-						
+
+
+
 						$otptrc = new OtpTrack();
 						$otptrc->email = $email;
 						$otptrc->otp = $otp;
 						$otptrc->type = 'password';
 						$otptrc->save();
-						
-						$this->send($email,$otp); 
-							
+
+						$this->send($email,$otp);
+
 						return response()->json([
 							'success' => true,
 							'status' => 'success',
 							'otptoken'=> $otptoken,
 							'reqtime' => $request->reqtime,
 							'code' =>  200,
-							'message' => 'OTP successfully has been sent',         
+							'message' => 'OTP successfully has been sent',
 						], 200);
-						
-						
-						
+
+
+
 					}else{
-						
+
 						return response()->json([
 							'success' => false,
 							'status' => 'error',
 							'code' =>  422,
-							'message' => 'OTP not sent',         
+							'message' => 'OTP not sent',
 						], 422);
 					}
-					
+
 				}else{
-					
+
 					$passverfotp = DB::table('userpassverification')->where('email', $email)->update(['otp'=> $otp, 'otptoken'=> $otptoken ]);
-					if($passverfotp){ 
-					
-						
+					if($passverfotp){
+
+
 						$otptrc = new OtpTrack();
 						$otptrc->email = $email;
 						$otptrc->otp = $otp;
 						$otptrc->type = 'password';
 						$otptrc->save();
-						
+
 						$this->send( $email, $otp );
-						
+
 						return response()->json([
 							'success' => true,
 							'status' => 'success',
 							'otptoken'=> $otptoken,
 							'reqtime' => $request->reqtime,
 							'code' =>  200,
-							'message' => 'OTP successfully has been sent',         
+							'message' => 'OTP successfully has been sent',
 						], 200);
-						
+
 					}else{
-						
+
 						return response()->json([
 							'success' => false,
 							'status' => 'error',
 							'code' =>  422,
-							'message' => 'OTP not sent',         
+							'message' => 'OTP not sent',
 						], 422);
-						
+
 					}
-					
+
 				}
-				
-						
+
+
 			}else{
 				return Response::json(array(
 					'success' => false,
@@ -205,24 +208,24 @@ class PasswordResetRequestController extends Controller{
 					'message'   =>  'Use does not exist with this email'
 				), 404);
 			}
-				
-		} catch(Exception $e) { 
-		   
+
+		} catch(Exception $e) {
+
 			return Response::json(array(
 					'status'    => 'error',
 					'code'      =>  404,
 					'message'   =>  'Unauthorized : '.$e->getmessage()
 				), 404);
-			
+
 
 		}
-		
+
     }
-	
-	
+
+
 	public function verifypasswordotp(Request $request){
-		
-		
+
+
 		$validator = Validator::make($request->all(), [
             'email' => 'required|email|max:156',
 			'otp' => 'required|regex:/\b\d{6}\b/'
@@ -234,50 +237,50 @@ class PasswordResetRequestController extends Controller{
 				'success' => false,
 				'status' => 'error',
 				'code' => 400,
-				'message' => $error,         
+				'message' => $error,
 			], 400);
-        }	
-		
-		
-		
+        }
+
+
+
 		$passverf = DB::table('userpassverification')->where('email', $request->email)->first();
 		if($passverf){
-			
+
 			if($passverf->otp == $request->otp){
-				
+
 				return response()->json([
 					'success' => true,
-					'status' => 'success', 
+					'status' => 'success',
 					'code' => 200,
-					'message' => 'User password reset OTP verified'       
+					'message' => 'User password reset OTP verified'
 				], 200);
-				
+
 			}else{
 				return response()->json([
 					'success' => false,
 					'status' => 'error',
 					'code' => 401,
-					'message' => 'User password reset OTP do not match'       
+					'message' => 'User password reset OTP do not match'
 				], 401);
-				
+
 			}
-			
+
 		}else{
 			return response()->json([
 				'success' => false,
 				'status' => 'error',
 				'code' => 400,
-				'message' => 'User password reset request not found',         
+				'message' => 'User password reset request not found',
 			], 400);
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 	public function send( $email, $msg){
-		
-		
+
+
 		$otp = $msg;
         		$msg = '<!DOCTYPE HTML><html>
 						<head>
@@ -291,20 +294,20 @@ class PasswordResetRequestController extends Controller{
 							<p>Welcome, We thank you for your registration at FitIndia mobile app.</p>
 							<p>Your user id is '.$email.' </p>
 							<p>Your password reset Verification OTP code is : '.$otp.'</p>
-							
+
 							<p>Regards, <br> Fit India Mission</p>
-							
+
 						</body>
 						</html>';
-			
+
 		$curlparams = array(
 						'user_email' =>$email,
 						'message' => $msg,
-						'subject' => 'FIT INDIA User Password Reset OTP',						
+						'subject' => 'FIT INDIA User Password Reset OTP',
 						);
 
 				$curl_options = array(
-					CURLOPT_URL => "http://10.246.120.25/mail.php", 
+					CURLOPT_URL => "http://10.246.120.25/mail.php",
 					CURLOPT_POST => true,
 					CURLOPT_POSTFIELDS => http_build_query($curlparams),
 					CURLOPT_RETURNTRANSFER => true,
@@ -312,21 +315,21 @@ class PasswordResetRequestController extends Controller{
 				);
 
 				$curl = curl_init();
-				curl_setopt_array($curl, $curl_options);					
+				curl_setopt_array($curl, $curl_options);
 				$result = curl_exec($curl);
 				curl_close($curl);
-					
+
 		/*
-        $token = $this->createToken($email);         
+        $token = $this->createToken($email);
         $site_url=(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http")."://".$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-        $url_link=explode('api/', $site_url); 
-		
-		$linkurl=$url_link[0].'update-password?token='.$token;		
-			
+        $url_link=explode('api/', $site_url);
+
+		$linkurl=$url_link[0].'update-password?token='.$token;
+
 		$curl_to_post_parameters = array(
 						'user_email'=>$email,
 						'message'=>$linkurl,
-						'subject'=>'Change Your Password'						
+						'subject'=>'Change Your Password'
 						);
 
 					   $curl_options = array(
@@ -338,15 +341,15 @@ class PasswordResetRequestController extends Controller{
 					);
 
 					$curl = curl_init();
-					curl_setopt_array($curl, $curl_options);					
+					curl_setopt_array($curl, $curl_options);
 					$result = curl_exec($curl);
-					curl_close($curl);			  
+					curl_close($curl);
 		*/
-		
-    }	
-	
+
+    }
+
 	public function createToken($email){
-		
+
       $isToken = DB::table('password_resets')->where('email', $email)->first();
 
       if($isToken) {
@@ -357,20 +360,20 @@ class PasswordResetRequestController extends Controller{
       $this->saveToken($token, $email);
       return $token;
     }
-	
-	
+
+
 	public function saveToken($token, $email){
-		
+
         DB::table('password_resets')->insert([
             'email' => $email,
             'token' => $token,
-            'created_at' => Carbon::now()            
+            'created_at' => Carbon::now()
         ]);
     }
-	
+
 	public function validEmail($email) {
 
        return !!User::where('email', $email)->first();
-    }	
-	
+    }
+
 }

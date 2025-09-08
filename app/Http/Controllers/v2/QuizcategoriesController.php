@@ -31,16 +31,16 @@ class QuizcategoriesController extends Controller
 
             $user = auth('api')->user();
 
-            if($user){                
+            if($user){
 
                 $data = Quizcategories::withCount(['quizTitleLists' => function($q){
                                         $q->whereStatus(true);
                                         }])
-                                        ->where([                                            
+                                        ->where([
                                             ['status','=' , 1]
                                             ])
-                                        ->get();               
-                
+                                        ->get();
+
                 if($data->count() > 0){
                     return Response::json(array(
                         'status'    => 'success',
@@ -92,22 +92,22 @@ class QuizcategoriesController extends Controller
     public function quiz_title_lists(Request $request){
 
         try{
-            
-            $quiz_categories_id = $request->quiz_categories_id;            
-            $user_id = $request->user_id;            
+
+            $quiz_categories_id = $request->quiz_categories_id;
+            $user_id = $request->user_id;
 
             if($user_id == null || $user_id == '' || is_int($request->user_id) === false){
-                
+
                 $error_code = '801';
-                $error_message = 'Required User id';                
-                
+                $error_message = 'Required User id';
+
                 return Response::json(array(
                     'isSuccess' => 'false',
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200);    
-            }            
+                ), 200);
+            }
 
             if($quiz_categories_id == "") {
 				return Response::json(array(
@@ -119,19 +119,19 @@ class QuizcategoriesController extends Controller
 
             $user = auth('api')->user();
 
-            if($user){                
+            if($user){
                 // dd("done");
-                $data = Quiztitlelists::                                        
+                $data = Quiztitlelists::
                                         leftJoin('quiz_user_attempts', function($leftJoin)use($user_id)
                                         {
                                             $leftJoin->on('quiz_title_lists.id', '=', 'quiz_user_attempts.quiz_title_list_id')
                                                 ->where('quiz_user_attempts.user_id', '=', $user_id)
-                                                ->distinct('quiz_user_attempts.user_id');                                                
+                                                ->distinct('quiz_user_attempts.user_id');
                                         })
                                         ->where([
-                                                ['quiz_title_lists.status','=', 1],                                                                                                
-                                                ['quiz_title_lists.quiz_categories_id','=', $quiz_categories_id],                                                                                                
-                                        ])  
+                                                ['quiz_title_lists.status','=', 1],
+                                                ['quiz_title_lists.quiz_categories_id','=', $quiz_categories_id],
+                                        ])
                                         // ->where(,)
                                         ->select(
                                                 'quiz_title_lists.id as quiz_title_id',
@@ -139,13 +139,13 @@ class QuizcategoriesController extends Controller
                                                 'quiz_title_lists.name',
                                                 'quiz_title_lists.description',
                                                 'quiz_title_lists.icon',
-                                                'quiz_title_lists.duration',                                                
+                                                'quiz_title_lists.duration',
                                                 'quiz_user_attempts.user_id'
-                                                )                                        
+                                                )
                                         // ->take(1)
-                                        // ->get(); 
+                                        // ->get();
                                         ->paginate(20);
-                // dd($data);                                    
+                // dd($data);
                 if($data->count() > 0){
                     return Response::json(array(
                         'status'    => 'success',
@@ -199,22 +199,22 @@ class QuizcategoriesController extends Controller
     public function quiz_title_lists_v2(Request $request){
 
         try{
-            
-            $quiz_categories_id = $request->quiz_categories_id;            
-            $user_id = $request->user_id;            
+
+            $quiz_categories_id = $request->quiz_categories_id;
+            $user_id = $request->user_id;
 
             if($user_id == null || $user_id == '' || is_int($request->user_id) === false){
-                
+
                 $error_code = '801';
-                $error_message = 'Required User id';                
-                
+                $error_message = 'Required User id';
+
                 return Response::json(array(
                     'isSuccess' => 'false',
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200);    
-            }            
+                ), 200);
+            }
 
             if($quiz_categories_id == "") {
 				return Response::json(array(
@@ -226,19 +226,19 @@ class QuizcategoriesController extends Controller
 
             $user = auth('api')->user();
 
-            if($user){                
+            if($user){
                 // dd("done");
-                // $data = Quiztitlelists::                                        
+                // $data = Quiztitlelists::
                 //                         leftJoin('quiz_user_attempts', function($leftJoin)use($user_id)
                 //                         {
                 //                             $leftJoin->on('quiz_title_lists.id', '=', 'quiz_user_attempts.quiz_title_list_id')
                 //                                 ->where('quiz_user_attempts.user_id', '=', $user_id)
-                //                                 ->distinct('quiz_user_attempts.user_id');                                                
+                //                                 ->distinct('quiz_user_attempts.user_id');
                 //                         })
                 //                         ->where([
-                //                                 ['quiz_title_lists.status','=', 1],                                                                                                
-                //                                 ['quiz_title_lists.quiz_categories_id','=', $quiz_categories_id],                                                                                                
-                //                         ])  
+                //                                 ['quiz_title_lists.status','=', 1],
+                //                                 ['quiz_title_lists.quiz_categories_id','=', $quiz_categories_id],
+                //                         ])
                 //                         // ->where(,)
                 //                         ->select(
                 //                                 'quiz_title_lists.id as quiz_title_id',
@@ -246,13 +246,13 @@ class QuizcategoriesController extends Controller
                 //                                 'quiz_title_lists.name',
                 //                                 'quiz_title_lists.description',
                 //                                 'quiz_title_lists.icon',
-                //                                 'quiz_title_lists.duration',                                                
+                //                                 'quiz_title_lists.duration',
                 //                                 'quiz_user_attempts.user_id'
-                //                                 )                                        
+                //                                 )
                 //                         // ->take(1)
-                //                         // ->get(); 
+                //                         // ->get();
                 //                         ->paginate(20);
-                // dd($data);   
+                // dd($data);
                 $query = DB::table('quiz_title_lists')
                             ->select([
                                 'quiz_title_lists.id as quiz_title_id',
@@ -283,9 +283,9 @@ class QuizcategoriesController extends Controller
                             // )
                             ->distinct();
 
-                        // $data = $query->get();   
-                        $data = $query->paginate(20);   
-                        // dd($data);                              
+                        // $data = $query->get();
+                        $data = $query->paginate(20);
+                        // dd($data);
                 if($data->count() > 0){
                     return Response::json(array(
                         'status'    => 'success',
@@ -351,7 +351,7 @@ class QuizcategoriesController extends Controller
 					'message'   =>  'Quiz Categories ID'
 				), 422);
 			}
-            
+
             if($quiz_title_list_id == "") {
 				return Response::json(array(
 					'status'    => 'error',
@@ -362,14 +362,14 @@ class QuizcategoriesController extends Controller
 
             $user = auth('api')->user();
 
-            if($user){                
+            if($user){
 
                 $data = Quizmasterqueans::where([
                                                 ['status','=', 1],
                                                 ['quiz_categories_id','=', $quiz_categories_id],
                                                 ['quiz_title_list_id','=', $quiz_title_list_id],
                                               ])
-                                        ->get();                
+                                        ->get();
                 if($data->count() > 0){
                     return Response::json(array(
                         'status'    => 'success',
@@ -428,37 +428,37 @@ class QuizcategoriesController extends Controller
             $user_id = is_int($request->user_id);
 
             if($user_id == null || $user_id == '' || $user_id === false){
-                
+
                 $error_code = '801';
-                $error_message = 'Required User id';                
-                
+                $error_message = 'Required User id';
+
                 return Response::json(array(
                     'isSuccess' => 'false',
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200);    
+                ), 200);
             }
 
             if(count($request->quizuserattempt) == 0){
                 $error_code = '801';
-                $error_message = 'User Attempt List Not Array';                
-                
+                $error_message = 'User Attempt List Not Array';
+
                 return Response::json(array(
                     'isSuccess' => 'false',
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200); 
+                ), 200);
             }
 
             $user = auth('api')->user();
 
-            if($user){                
-                
+            if($user){
+
                     $quizuserattempt = $request->quizuserattempt;
 
-                    foreach($quizuserattempt as $key => $value){   
+                    foreach($quizuserattempt as $key => $value){
                         // echo $value['quiz_categories_id'];
                         // echo '<br/>';
                         $Quizuserattempt = new Quizuserattempts();
@@ -467,13 +467,13 @@ class QuizcategoriesController extends Controller
                         $Quizuserattempt->quiz_title_list_id = $value['quiz_title_list_id'];
                         $Quizuserattempt->quiz_master_question_answers_id = $value['quiz_master_question_answers_id'];
                         $Quizuserattempt->ans_option_id = $value['ans_option_id'];
-                        $Quizuserattempt->is_correct = $value['is_correct'];                        
-                        $Quizuserattempt->mark = $value['mark'];                        
+                        $Quizuserattempt->is_correct = $value['is_correct'];
+                        $Quizuserattempt->mark = $value['mark'];
                         $Quizuserattempt->question_status = $value['question_status'];
                         $Quizuserattempt->quiz_timeing = $value['quiz_timeing'];
                         $Quizuserattempt->status = 1;
-                        $Quizuserattempt->save(); 
-                        
+                        $Quizuserattempt->save();
+
                     }
 
                     // dd("done");
@@ -482,7 +482,7 @@ class QuizcategoriesController extends Controller
                         'code'      => 200,
                         'data'      => null,
                         'message'   => 'Insert Success'
-                    ), 200);                  
+                    ), 200);
                 // }
 
 
@@ -522,29 +522,29 @@ class QuizcategoriesController extends Controller
         try{
 
             $user = auth('api')->user();
-            
+
             if($user){
-                
+
                 $user_id = is_int($request->user_id);
 
                 if($user_id == null || $user_id == '' || $user_id === false){
-                    
+
                     $error_code = '801';
-                    $error_message = 'Required User id';                
-                    
+                    $error_message = 'Required User id';
+
                     return Response::json(array(
                         'isSuccess' => 'false',
                         'code'      => $error_code,
                         'data'      => null,
                         'message'   => $error_message
-                    ), 200);    
+                    ), 200);
                 }
 
                 // $data = DB::table('user_ranks')
                 // $data = DB::table('quiz_user_ranks')
-                //             ->where([['user_id','=' , $request['user_id']]])    
+                //             ->where([['user_id','=' , $request['user_id']]])
                 //             ->get();
-                
+
 
                 // if($data->count() > 0){
                 //     return Response::json(array(
@@ -568,7 +568,7 @@ class QuizcategoriesController extends Controller
                         ->join('users', 'usermetas.user_id', '=', 'users.id')
                         ->where([
                             ['quiz_user_attempts.status','=', 1],
-                            // ['quiz_user_attempts.user_id','=' , $request['user_id']]                                                                                                                         
+                            // ['quiz_user_attempts.user_id','=' , $request['user_id']]
                         ])
                         // ->whereRaw("quiz_user_attempts.created_at >= NOW()-INTERVAL $days DAY")
                         ->groupBy(
@@ -588,9 +588,9 @@ class QuizcategoriesController extends Controller
                             'usermetas.image',
                             // 'quiz_user_attempts.created_at'
                         )
-                        ->orderby('rank', 'desc')  
+                        ->orderby('rank', 'desc')
                         ->get();
-                    
+
                 if($data->count() > 0){
 
                     foreach ($data as $key => $val) {
@@ -598,13 +598,13 @@ class QuizcategoriesController extends Controller
                         if ($val->user_id === $request['user_id']) {
                             $user_id = $val->user_id;
                             $rank = $val->rank;
-                            $score = $val->score;                    
-                            $quiz_timeing = $val->quiz_timeing;                    
+                            $score = $val->score;
+                            $quiz_timeing = $val->quiz_timeing;
                         }
                     }
 
                     $all_data = array(array (
-                        // "active_user_count" => count($active_user),                        
+                        // "active_user_count" => count($active_user),
                         "user_id" => $user_id,
                         "score" => $score,
                         "quiz_timeing" => $quiz_timeing,
@@ -660,32 +660,32 @@ class QuizcategoriesController extends Controller
             }
         }
     }
-    
+
     public function getAllUserRank(Request $request){
-        
+
         try{
             // dd(21231231);
             $type = $request['type'];
 
             if($type == null || $type == ''){
-                    
+
                 $error_code = '801';
-                $error_message = 'Required Type';                
-                
+                $error_message = 'Required Type';
+
                 return Response::json(array(
                     'isSuccess' => 'false',
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200);    
+                ), 200);
             }
             // dd($type);
             if($type == 'm'){
                 $days = 31;
                 // dd("asdfasdfasfd");
                 // $transdate = date('d-m-Y', time());
-                // $condition_wise = date('m', strtotime($transdate));       
-                // $sinoprater = '=';     
+                // $condition_wise = date('m', strtotime($transdate));
+                // $sinoprater = '=';
                 // $where_condition = "whereMonth";
                 // $month_query = "->whereMonth('user_rank.created_at', '=',$month)";
                 // dd($query);
@@ -703,20 +703,20 @@ class QuizcategoriesController extends Controller
                 // $where_condition = "where";
             }
             $user = auth('api')->user();
-            
-            if($user){                 
-                
+
+            if($user){
+
                 // $data = DB::table('user_ranks')
                 //             ->join('usermetas', 'usermetas.user_id', '=', 'user_ranks.user_id')
                 //             ->join('quiz_user_attempts', 'usermetas.user_id', '=', 'user_ranks.user_id')
-                //             ->join('users', 'usermetas.user_id', '=', 'users.id')                            
+                //             ->join('users', 'usermetas.user_id', '=', 'users.id')
                 //             ->$where_condition('quiz_user_attempts.created_at', $sinoprater, $condition_wise)
                 //             // ->where( 'user_rank.created_at', '>', date('Y-m-d', strtotime("-7 days")))
                 //             ->select(
                 //                         'users.name as name',
                 //                         'usermetas.image as image',
-                //                         'user_ranks.user_id as user_id', 
-                //                         'user_ranks.score as score', 
+                //                         'user_ranks.user_id as user_id',
+                //                         'user_ranks.score as score',
                 //                         'user_ranks.rank as rank',
                 //                         'quiz_user_attempts.created_at'
                 //                     )
@@ -729,7 +729,7 @@ class QuizcategoriesController extends Controller
                 $data = DB::table('user_ranks')
                             ->join('usermetas', 'usermetas.user_id', '=', 'user_ranks.user_id')
                             ->join('quiz_user_attempts', 'usermetas.user_id', '=', 'user_ranks.user_id')
-                            ->join('users', 'usermetas.user_id', '=', 'users.id')                            
+                            ->join('users', 'usermetas.user_id', '=', 'users.id')
                             // ->$where_condition('quiz_user_attempts.created_at', $sinoprater, $condition_wise)
                             // ->whereRaw("quiz_user_attempts.created_at >= NOW()-INTERVAL $days DAY")
                             ->where('quiz_user_attempts.created_at', '>', date($date))
@@ -739,21 +739,21 @@ class QuizcategoriesController extends Controller
                                         // DB::raw('users.name','Unknown'),
                                         DB::raw('IFNULL(users.name, "Unknown") as name'),
                                         'user_ranks.score',
-                                        'user_ranks.user_id', 
+                                        'user_ranks.user_id',
                                         // 'users.name',
                                         'usermetas.image',
                                         'user_ranks.rank',
                                         // 'quiz_user_attempts.quiz_timeing',
-                                        // DB::raw('quiz_user_attempts.created_at >= NOW()-INTERVAL 30 DAY'),                                        
+                                        // DB::raw('quiz_user_attempts.created_at >= NOW()-INTERVAL 30 DAY'),
                                         // 'quiz_user_attempts.created_at',
-                                        
+
                                         // 'quiz_user_attempts.user_id',
                                         // 'quiz_user_attempts.user_id',
                                         // 'quiz_user_attempts.quiz_categories_id',
                                         // 'quiz_user_attempts.quiz_title_list_id',
                                         // 'quiz_user_attempts.quiz_master_question_answers_id',
                                     )
-                                // ->sum('quiz_user_attempts.mark')    
+                                // ->sum('quiz_user_attempts.mark')
                             ->groupBy(
                                         'user_ranks.user_id',
                                         'users.name',
@@ -768,7 +768,7 @@ class QuizcategoriesController extends Controller
                             ->paginate(20);
                 // dd("done");
                 // $transdate = date('d-m-Y', time());
-                
+
                 // $data = DB::select("SELECT sum(quiz_user_attempts.mark) as score,user_ranks.user_id,users.name as name,usermetas.image as image,user_ranks.rank,quiz_user_attempts.created_at
                 //                     FROM user_ranks
                 //                     inner join usermetas on usermetas.user_id = user_ranks.user_id
@@ -826,23 +826,23 @@ class QuizcategoriesController extends Controller
         }
     }
     public function getAllUserRankv2(Request $request){
-        
+
         try{
-            
+
             $type = $request['type'];
 
             if($type == null || $type == ''){
-                    
+
                 $error_code = '801';
-                $error_message = 'Required Type';                
-                
+                $error_message = 'Required Type';
+
                 return Response::json(array(
                     'isSuccess' => 'false',
                     'code'      => $error_code,
                     'data'      => null,
                     'message'   => $error_message
-                ), 200);    
-            }   
+                ), 200);
+            }
 
             if($type == 'm'){
 
@@ -853,19 +853,19 @@ class QuizcategoriesController extends Controller
                 $days = 8;
 
             }else if($type == 'a'){
-                
+
                 $days = 366;
 
             }
             $user = auth('api')->user();
-            
-            if($user){                                 
-                
+
+            if($user){
+
                 $data = DB::table('quiz_user_attempts')
                         ->join('usermetas', 'usermetas.user_id', '=', 'quiz_user_attempts.user_id')
                         ->join('users', 'usermetas.user_id', '=', 'users.id')
                         ->where([
-                            ['quiz_user_attempts.status','=', 1]                                                                                                                         
+                            ['quiz_user_attempts.status','=', 1]
                         ])
                         ->whereRaw("quiz_user_attempts.created_at >= NOW()-INTERVAL $days DAY")
                         ->groupBy(
@@ -885,10 +885,10 @@ class QuizcategoriesController extends Controller
                             'usermetas.image',
                             // 'quiz_user_attempts.created_at'
                         )
-                        ->orderby('rank', 'asc')  
-                        ->paginate(20);                      
-                        // ->get();     
-                            
+                        ->orderby('rank', 'asc')
+                        ->paginate(20);
+                        // ->get();
+
                 // dd($data);
                 if(count($data) > 0){
                     return Response::json(array(
@@ -939,17 +939,17 @@ class QuizcategoriesController extends Controller
     }
 
     public function useremailsend(Request $request){
-        
+
         try{
-            
+
             // dd("useremailsend");
-            
-            
-            $query = "SELECT id,name,email FROM `users` where phone in (9772749970,9050123455,8435846930,7506342339,8527412805,7006324121,7011556474,8585957826,6357337529,9015161734,9818751007,9473684656,9733009595,9769007788,9871162457,9818943170);"; 
-            
+
+
+            $query = "SELECT id,name,email FROM `users` where phone in (9772749970,9050123455,8435846930,7506342339,8527412805,7006324121,7011556474,8585957826,6357337529,9015161734,9818751007,9473684656,9733009595,9769007788,9871162457,9818943170);";
+
             $data = DB::select(DB::raw($query));
             // dd($data);
-            foreach($data as $key => $value){   
+            foreach($data as $key => $value){
                 // dd($value);
                 $user_id = $value->id;
                 $name = $value->name;
@@ -990,10 +990,10 @@ class QuizcategoriesController extends Controller
     //         dd(1);
     //         exit;
     //         echo $var;
-    //         echo '<br>';            
+    //         echo '<br>';
     //         $curl = curl_init();
     //         curl_setopt_array($curl, array(
-    //             CURLOPT_URL => "http://10.246.120.18/test/mail/useremailsend.php?email=$email&name=$name",						   
+    //             CURLOPT_URL => "http://10.246.120.18/test/mail/useremailsend.php?email=$email&name=$name",
     //             CURLOPT_RETURNTRANSFER => true,
     //             CURLOPT_ENCODING => '',
     //             CURLOPT_MAXREDIRS => 10,
@@ -1002,7 +1002,7 @@ class QuizcategoriesController extends Controller
     //             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     //             CURLOPT_CUSTOMREQUEST => 'GET',
     //         ));
-        
+
     //         // dd("$curl");
     //         $response = curl_exec($curl);
     //         // dd($response);
@@ -1015,8 +1015,8 @@ class QuizcategoriesController extends Controller
     //             $Mailtrakings->user_id = $user_id;
     //             $Mailtrakings->email = $email;
     //             $Mailtrakings->status = 1;
-    //             $Mailtrakings->event_name = $event_name;                                              
-    //             $Mailtrakings->save();			
+    //             $Mailtrakings->event_name = $event_name;
+    //             $Mailtrakings->save();
     //             // return true;
     //         }else{
 
@@ -1024,27 +1024,27 @@ class QuizcategoriesController extends Controller
     //             $Mailtrakings->user_id = $user_id;
     //             $Mailtrakings->email = $email;
     //             $Mailtrakings->status = 0;
-    //             $Mailtrakings->event_name = $event_name;                                              
+    //             $Mailtrakings->event_name = $event_name;
     //             $Mailtrakings->save();
     //             // return false;
     //         }
-    //     }    
+    //     }
 
 	// }
 
     public function useremailallsend(Request $request){
-        
+
         try{
-            
+
             dd("useremailallsend");
-            
-            
-            // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where id in (SELECT DISTINCT(user_id) FROM `devicedetails`) and id NOT IN (SELECT user_id FROM `mail_trakings`) and email != 'undefined' limit 10000;"; 
-            $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where email != 'undefined' limit 1;"; 
-            
+
+
+            // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where id in (SELECT DISTINCT(user_id) FROM `devicedetails`) and id NOT IN (SELECT user_id FROM `mail_trakings`) and email != 'undefined' limit 10000;";
+            $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where email != 'undefined' limit 1;";
+
             $data = DB::select(DB::raw($query));
             // dd($data);
-            foreach($data as $key => $value){   
+            foreach($data as $key => $value){
                 // dd($value);
                 $user_id = $value->id;
                 $name = $value->name;
@@ -1075,20 +1075,21 @@ class QuizcategoriesController extends Controller
             // }
         }
     }
-    
+
     public function useremailalltwosend(Request $request){
-        
+
         try{
-            
-            // dd("useremailalltwosend");
-            
-            
-            // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where id in (SELECT DISTINCT(user_id) FROM `devicedetails`) and id NOT IN (SELECT user_id FROM `mail_trakings`) and email != 'undefined' limit 10000;"; 
-            $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where email != 'undefined' order by id desc limit 10000,10000;"; 
-            
+
+            dd("useremailalltwosend");
+
+
+            // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where id in (SELECT DISTINCT(user_id) FROM `devicedetails`) and id NOT IN (SELECT user_id FROM `mail_trakings`) and email != 'undefined' limit 10000;";
+            // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where email != 'undefined' order by id desc limit 10000,10000;";
+            $query = "SELECT id,name,email FROM `users` where phone in (9818943170);";
+
             $data = DB::select(DB::raw($query));
             // dd($data);
-            foreach($data as $key => $value){   
+            foreach($data as $key => $value){
                 // dd($value);
                 $user_id = $value->id;
                 $name = $value->name;
@@ -1124,10 +1125,10 @@ class QuizcategoriesController extends Controller
 
 		// dd($email);
 		// return dd($name);
-                    
+
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "http://10.246.120.18/test/mail/useremailsend.php?email=$email&name=$name",						   
+            CURLOPT_URL => "http://10.246.120.18/test/mail/forgetuseremailsend.php?email=$email&name=$name",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -1136,7 +1137,7 @@ class QuizcategoriesController extends Controller
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
-    
+
         // dd("$curl");
         $response = curl_exec($curl);
         // dd($response);
@@ -1149,8 +1150,8 @@ class QuizcategoriesController extends Controller
             $Mailtrakings->user_id = $user_id;
             $Mailtrakings->email = $email;
             $Mailtrakings->status = 1;
-            $Mailtrakings->event_name = $event_name;                                              
-            $Mailtrakings->save();			
+            $Mailtrakings->event_name = $event_name;
+            $Mailtrakings->save();
             // return true;
         }else{
 
@@ -1158,18 +1159,18 @@ class QuizcategoriesController extends Controller
             $Mailtrakings->user_id = $user_id;
             $Mailtrakings->email = $email;
             $Mailtrakings->status = 0;
-            $Mailtrakings->event_name = $event_name;                                              
+            $Mailtrakings->event_name = $event_name;
             $Mailtrakings->save();
             // return false;
-        }        
+        }
 
 	}
 
-    function sendMailsingle($email,$name,$user_id,$event_name){		       
-                   
+    function sendMailsingle($email,$name,$user_id,$event_name){
+
         $curl = curl_init();
         // curl_setopt_array($curl, array(
-        //     CURLOPT_URL => "http://10.246.120.18/test/mail/useremailsend.php?email=$email&name=$name",						   
+        //     CURLOPT_URL => "http://10.246.120.18/test/mail/useremailsend.php?email=$email&name=$name",
         //     CURLOPT_RETURNTRANSFER => true,
         //     CURLOPT_ENCODING => '',
         //     CURLOPT_MAXREDIRS => 10,
@@ -1184,7 +1185,7 @@ class QuizcategoriesController extends Controller
         // $email = trim($email);
         // $name = trim($name);
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://10.246.120.18/test/mail/useremailsend.php?email='.$email,						   
+            CURLOPT_URL => 'http://10.246.120.18/test/mail/useremailsend.php?email='.$email,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -1193,7 +1194,7 @@ class QuizcategoriesController extends Controller
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
-    
+
         // dd("$curl");
         $response = curl_exec($curl);
         // dd($response);
@@ -1206,8 +1207,8 @@ class QuizcategoriesController extends Controller
             $Mailtrakings->user_id = $user_id;
             $Mailtrakings->email = $email;
             $Mailtrakings->status = 1;
-            $Mailtrakings->event_name = $event_name;                                              
-            $Mailtrakings->save();			
+            $Mailtrakings->event_name = $event_name;
+            $Mailtrakings->save();
             // return true;
         }else{
 
@@ -1215,7 +1216,7 @@ class QuizcategoriesController extends Controller
             $Mailtrakings->user_id = $user_id;
             $Mailtrakings->email = $email;
             $Mailtrakings->status = 0;
-            $Mailtrakings->event_name = $event_name;                                              
+            $Mailtrakings->event_name = $event_name;
             $Mailtrakings->save();
             // return false;
         }
@@ -1223,8 +1224,8 @@ class QuizcategoriesController extends Controller
 
     public function useremail(){
         // dd("useremail");
-        // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where email != 'undefined' order by id desc limit 1;";         
-        // $query = "select users.id,IFNULL(users.name, 'Fitindia User') as name,users.email from users left join usermetas on users.id = usermetas.user_id where users.rolewise like '%cyclothon-2024%';";         
+        // $query = "SELECT id,IFNULL(name, 'Fitindia User') as name,email FROM `users` where email != 'undefined' order by id desc limit 1;";
+        // $query = "select users.id,IFNULL(users.name, 'Fitindia User') as name,users.email from users left join usermetas on users.id = usermetas.user_id where users.rolewise like '%cyclothon-2024%';";
         // $query = 'SELECT id,IFNULL(name, "Fitindia User") as name,email FROM `users` where email  in ("ghondano.2@gmail.com")';
         $query = 'SELECT id,IFNULL(name, "Fitindia User") as name,email FROM `users` where email  in ("ghondano.2@gmail.com",
                             "ankit.katiyar@netprophetsglobal.com",
@@ -2019,10 +2020,10 @@ class QuizcategoriesController extends Controller
                             "jibu@flomicgroup.com") order by id desc limit 1000;';
         $data = DB::select(DB::raw($query));
             // dd($data);
-            foreach($data as $key => $value){   
+            foreach($data as $key => $value){
                 // dd($value);
                 $user_id = $value->id;
-                $name = $value->name;                
+                $name = $value->name;
                 $email = $value->email;
                 $event_name = "Fit India Cycling Drive";
                 // $this->sendMailsingle($email,$name,$user_id,$event_name);
@@ -2031,5 +2032,5 @@ class QuizcategoriesController extends Controller
                 echo '<br/>';
             }
     }
-    
+
 }

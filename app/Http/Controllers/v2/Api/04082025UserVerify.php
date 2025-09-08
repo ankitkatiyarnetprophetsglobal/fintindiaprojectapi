@@ -743,7 +743,7 @@ class UserVerify extends Controller
     }
 
     public function verifyuser(Request $request){
-	   //dd($request);
+	   dd($request);
 	   try{
 			// return response()->json([
 			// 'data' => $request->all(),
@@ -858,139 +858,118 @@ class UserVerify extends Controller
 			}
 
 			//$verifyUser = Userverification::where('email', $email)->first();
-		// dd($verifyUser);
-		if(!empty($verifyUser)){
 
-			$static_otp_verify = "937182";
+		if(!empty($verifyUser)){
 
 			if(empty($verifyUser->isverified)){
 
-            	// $static_otp_verify = "937182";
+            $static_otp_verify = "937182";
 
-				if($cflag==1){
-					//echo $otp."aaaa".$email; die;
-					// $static_otp_verify = "937182";
-					if($otp == $verifyUser->otp || $static_otp_verify == $otp){
+            if($cflag==1){
+	            //echo $otp."aaaa".$email; die;
+                $static_otp_verify = "937182";
+				if($otp == $verifyUser->otp){
 
-						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+					//Userverification::where('email', $request->email)->update(['isverified' => '1']);
 
-						$userverf = User::where('email', $email)->first();
+					$userverf = User::where('email', $email)->first();
 
-						if(!empty($userverf)){
+					if(!empty($userverf)){
 
-							User::where('email', $email)->update(['verified' => '1']);
-						}
-							Userverification::where('email', $email)->update(['isverified' => '1']);
-
-							return response()->json([
-							'success' => true,
-							'status'    => 'sucess',
-							'code'      =>  200,
-							'reqtime' => $request->reqtime,
-							'message' => 'Your e-mail is verified',
-							], 200);
-
-					}else{
-						return Response::json(array(
-						'status'    => 'error',
-						'success' => false,
-						'code'      =>  422,
-						'message'   =>  'OTP does not match'
-						), 422);
+						User::where('email', $email)->update(['verified' => '1']);
 					}
+						Userverification::where('email', $email)->update(['isverified' => '1']);
 
-				} else if($cflag==0){
+						return response()->json([
+						'success' => true,
+						'status'    => 'sucess',
+						'code'      =>  200,
+						'reqtime' => $request->reqtime,
+						'message' => 'Your e-mail is verified',
+						], 200);
 
-					if($otp == $verifyUser->otp || $static_otp_verify == $otp){
-
-						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
-
-						$userverf = User::where('phone', $email)->first();
-
-						if(!empty($userverf)){
-
-							User::where('phone', $email)->update(['verified' => '1']);
-						}
-							Userverification::where('phone', $email)->update(['isverified' => '1']);
-
-							return response()->json([
-							'success' => true,
-							'status'    => 'sucess',
-							'code'      =>  200,
-							'reqtime' => $request->reqtime,
-							'message' => 'Your phone number is verified',
-							], 200);
-
-					} else {
-						return Response::json(array(
-						'status'    => 'error',
-						'success' => false,
-						'code'      =>  422,
-						'message'   =>  'OTP does not match'
-						), 422);
-					}
-
-					//echo $otp."bbbb".$email; die;///9818654322
+				}else{
+					return Response::json(array(
+					'status'    => 'error',
+					'success' => false,
+					'code'      =>  422,
+					'message'   =>  'OTP does not match'
+					), 422);
 				}
 
-					/* if($otp == $verifyUser->otp){
+            } else if($cflag==0){
 
-						//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+				 if($otp == $verifyUser->otp){
 
-						$userverf = User::where('email', $email)->first();
+					//Userverification::where('email', $request->email)->update(['isverified' => '1']);
 
-						if(!empty($userverf)){
+					$userverf = User::where('phone', $email)->first();
 
-							User::where('email', $email)->update(['verified' => '1']);
-						}
-							Userverification::where('email', $email)->update(['isverified' => '1']);
+					if(!empty($userverf)){
 
-							return response()->json([
-							'success' => true,
-							'status'    => 'sucess',
-							'code'      =>  200,
-							'reqtime' => $request->reqtime,
-							'message' => 'Your e-mail is verified',
-							], 200);
+						User::where('phone', $email)->update(['verified' => '1']);
+					}
+						Userverification::where('phone', $email)->update(['isverified' => '1']);
 
-					}else{
-						return Response::json(array(
-						'status'    => 'error',
-						'success' => false,
-						'code'      =>  422,
-						'message'   =>  'OTP does not match'
-						), 422);
-					} */
+						return response()->json([
+						'success' => true,
+						'status'    => 'sucess',
+						'code'      =>  200,
+						'reqtime' => $request->reqtime,
+						'message' => 'Your phone number is verified',
+						], 200);
+
+				} else {
+					return Response::json(array(
+					'status'    => 'error',
+					'success' => false,
+					'code'      =>  422,
+					'message'   =>  'OTP does not match'
+					), 422);
+				}
+
+				//echo $otp."bbbb".$email; die;///9818654322
+            }
+
+				/* if($otp == $verifyUser->otp){
+
+					//Userverification::where('email', $request->email)->update(['isverified' => '1']);
+
+					$userverf = User::where('email', $email)->first();
+
+					if(!empty($userverf)){
+
+						User::where('email', $email)->update(['verified' => '1']);
+					}
+						Userverification::where('email', $email)->update(['isverified' => '1']);
+
+						return response()->json([
+						'success' => true,
+						'status'    => 'sucess',
+						'code'      =>  200,
+						'reqtime' => $request->reqtime,
+						'message' => 'Your e-mail is verified',
+						], 200);
+
+				}else{
+					return Response::json(array(
+					'status'    => 'error',
+					'success' => false,
+					'code'      =>  422,
+					'message'   =>  'OTP does not match'
+					), 422);
+				} */
 
 
 			} else {
 
-				if($otp == $verifyUser->otp || $static_otp_verify == $otp){
-
-					return response()->json([
-											'success' => true,
-											'status'    => 'sucess',
-											'code'      =>  200,
-											'reqtime' => $request->reqtime,
-											'message' => 'Your phone or email is verified',
-											], 200);
-				}else{
-
-					return Response::json(array(
-						'status'    => 'error',
-						'success' => false,
-						'code'      =>  422,
-						'message'   =>  'OTP does not match'
-						), 422);
-				}
-
-				return response()->json([
-					'success' => true,
-					'status'    => 'sucess',
-					'code'      =>  200,
-					'reqtime' => $request->reqtime,
-					'message' => 'Your data'.$email.' is already verified',
-					], 200);
+			  return response()->json([
+				'success' => true,
+				'status'    => 'sucess',
+				'code'      =>  200,
+				'reqtime' => $request->reqtime,
+				'message' => 'Your data'.$email.' is already verified',
+				], 200);
 			}
 
 		  } else {
@@ -1018,7 +997,7 @@ class UserVerify extends Controller
 
 
 	// new function 20-04-2023
-    public function generateotpvtwocopy(Request $request){
+    public function generateotpvtwo(Request $request){
 		// dd('1111111');
 
        	try{
@@ -1127,371 +1106,6 @@ class UserVerify extends Controller
 
 				$cflag='3';
 			}
-
-			if(!empty($userverification)){
-
-					// if(empty($userverification->isverified)){
-
-						if($cflag==1){
-
-							Userverification::where('email', $email)->update(['otp' => $otp]);
-
-							$otptrc = new OtpTrack();
-							$otptrc->email = $email;
-							$otptrc->otp = $otp;
-							$otptrc->type = 'user';
-							$otptrc->save();
-
-							// $emailres = $this->send( $email, $otp ); // email not working
-							// $this->sendMailOtp($email,$otp); // this is working
-
-
-							return response()->json([
-								'status' => 'success',
-								'code'   =>  200,
-								'success' => true,
-								'message' => 'Email OTP successfully has been send',
-								'reqtime' => $request->reqtime,
-							], 200);
-
-						} else if($cflag==0){
-
-							//echo "bbbb".$mobile; //die;
-
-							Userverification::where('phone', $mobile)->update(['otp' => $phone_otp]);
-
-							$smsres = $this->sendsms($mobile,$phone_otp);
-
-							$otptrc = new OtpTrack();
-							$otptrc->phone = $mobile;
-							$otptrc->otp = $phone_otp;
-							$otptrc->type = 'user';
-							$otptrc->save();
-
-							return response()->json([
-							'success' => true,
-							'status'  => 'success',
-							'code'    =>  200,
-							'message' => 'Phone OTP successfully has been send',
-							'reqtime' => $request->reqtime,
-							], 200);
-
-						} else if($cflag==3){
-
-							if(!empty($email)){
-								//echo "cccc".$email;
-
-								Userverification::where('email', $email)->update(['otp' => $otp]);
-
-								$otptrc = new OtpTrack();
-								$otptrc->email = $email;
-								$otptrc->otp = $otp;
-								$otptrc->type = 'user';
-								$otptrc->save();
-
-								// $emailres = $this->send( $email, $otp ); // email not working
-								// $this->sendMailOtp($email,$otp); // this is working
-
-							} else if(!empty($mobile)){
-
-								//echo "dddd".$mobile;
-
-								Userverification::where('phone', $mobile)->update(['otp' => $phone_otp]);
-
-								$smsres = $this->sendsms($mobile,$phone_otp);
-								$otptrc = new OtpTrack();
-								$otptrc->phone = $mobile;
-								$otptrc->otp = $phone_otp;
-								$otptrc->type = 'user';
-								$otptrc->save();
-							}
-
-							return response()->json([
-							'success' => true,
-							'status'  => 'success',
-							'code'    =>  200,
-							'message' => 'Phone Emil OTP successfully has been send',
-							'reqtime' => $request->reqtime,
-							], 200);
-
-						}
-
-					// } else {
-
-					// 	return response()->json([
-					// 		'status'    => 'success',
-					// 		'code'      =>  201,
-					// 		'success' => true,
-					// 		'message' => 'You are already Verified',
-					// 		'reqtime' => $request->reqtime,
-					// 		], 201);
-					// }
-
-				} else {
-
-						if($cflag==1){
-
-						//echo "kkkk1".$email; //die;
-
-						$userv = new Userverification();
-						$userv->email = $email;
-						$userv->otp = $otp;
-						$userv->save();
-
-						$otptrc = new OtpTrack();
-						$otptrc->email = $email;
-						$otptrc->otp = $otp;
-						$otptrc->type = 'user';
-						$otptrc->save();
-
-						// $emailres =  $this->send($email,$otp); // this is not working
-						// $this->sendMailOtp($email,$otp); // this is working
-
-						return response()->json([
-						'status'    => 'success',
-						'code'      =>  200,
-							'success' => true,
-							'message' => 'Email OTP successfully has been send',
-							'reqtime' => $request->reqtime,
-							], 200);
-
-						} else if($cflag==3){
-
-						$chk = Userverification::where('email', $email)->first();
-						$otchk = OtpTrack::where('email', $email)->first();
-
-						$chkm = Userverification::where('phone', $mobile)->first();
-						$otchkm = OtpTrack::where('phone', $mobile)->first();
-
-						//echo "<pre>";print_r($chk->email);
-							if(!empty($chk->email)){
-							$userv = Userverification::find($chk->id);
-							$userv->email = $email;
-							$userv->otp = $otp;
-							$userv->save();
-							} else {
-							$userv = new Userverification();
-							$userv->email = $email;
-							$userv->otp = $otp;
-							$userv->save();
-							}
-
-							if(!empty($otchk->email)){
-							$otptrc = OtpTrack::find($otchk->id);
-							$otptrc->email = $email;
-							$otptrc->otp = $otp;
-							$otptrc->save();
-							} else {
-							$otptrc = new OtpTrack();
-							$otptrc->email = $email;
-							$otptrc->otp = $otp;
-							$otptrc->save();
-							}
-
-							$emailres = $this->send($email,$otp);
-						//   $this->sendMailOtp($email,$otp); // this is working
-
-						//###################################
-
-						if(!empty($chkm->phone)){
-							$userv = Userverification::find($chkm->id);
-							$userv->phone = $mobile;
-							$userv->otp = $phone_otp;
-							$userv = $userv->save();
-							} else {
-							$userv = new Userverification();
-							$userv->phone = $mobile;
-							$userv->otp = $phone_otp;
-							$userv = $userv->save();
-							}
-
-							if(!empty($otchkm->phone)){
-							$otptrc = OtpTrack::find($otchkm->id);
-							$otptrc->phone = $mobile;
-							$otptrc->otp = $phone_otp;
-							$otptrc->type = 'user';
-							$otptrc = $otptrc->save();
-							} else {
-							$otptrc = new OtpTrack();
-							$otptrc->phone = $mobile;
-							$otptrc->otp = $phone_otp;
-							$otptrc->type = 'user';
-							$otptrc = $otptrc->save();
-							}
-
-						$smsres = $this->sendsms($mobile, $phone_otp);
-
-						return response()->json([
-						'status'    => 'success',
-						'code'      =>  200,
-							'success' => true,
-							'message' => 'Phone Email OTP successfully has been send',
-							'reqtime' => $request->reqtime,
-							], 200);
-
-
-						} else if($cflag==0){
-
-						//echo "kkkk4".$mobile; //die;
-
-						$userv = new Userverification();
-						$userv->phone = $mobile;
-						$userv->otp = $phone_otp;
-						$res = $userv->save();
-
-						$otptrc = new OtpTrack();
-						$otptrc->phone = $mobile;
-						$otptrc->otp = $phone_otp;
-						$otptrc->type = 'user';
-						$res = $otptrc->save();
-
-						$smsres = $this->sendsms($mobile,$phone_otp);
-
-						return response()->json([
-							'status'    => 'success',
-							'code'      =>  200,
-							'success' => true,
-							'message' => 'Phone OTP successfully has been send',
-							'reqtime' => $request->reqtime,
-							], 200);
-						}
-				}
-
-			} catch(Exception $e){
-				return Response::json(array(
-						'status'    => 'error',
-						'code'      =>  404,
-						'message'   =>  'Unauthorized : '.$e->getmessage()
-					), 404);
-			}
-	}
-
-	public function generateotpvtwo(Request $request){
-
-
-       	try{
-
-			$iv ="fedcba9876543210";
-			$key="0a9b8c7d6e5f4g3h";
-
-			if(strpos($request->reqtime, '=') == false){
-				return Response::json(array(
-					'status'    => 'error',
-					'code'      =>  422,
-					'message'   =>  'Not valid request'
-				), 422);
-			}
-
-			$reqtimevar = $this->decrypt($key, $iv, $request->reqtime);
-			$key = $reqtimevar.'fitind';
-			$email = $this->decrypt($key, $iv, trim($request->email));//email sms send
-			$email = trim($email);
-			$mobile = $this->decrypt($key, $iv, $request->mobile);//phone number sms send
-
-			$mobile = $this->decrypt($key, $iv, $request->mobile);//phone number sms send
-		    $messsages = array(
-					'email.required'=>'Please enter the email.',
-					'email.email'=>'Please enter valid email.',
-					'mobile.required'=>'Please enter the mobile number.',
-					'mobile.numeric'=>'Please enter numeric value.',
-					'mobile.digits'=>'Please enter min 10 digit number.',
-			);
-
-			if(empty($email) && !empty($mobile) && is_numeric($mobile) && $mobile=='0000000000'){
-
-			    return Response::json(array(
-					'status' => 'error', 'code'=> 500, 'data' =>'[]'
-				), 500);
-
-			} else if(empty($email) && !empty($mobile) && is_numeric($mobile) && $mobile!='0000000000'){
-
-			   $validator = Validator::make( array("phone" => $mobile),['phone' => 'required|digits:10'],$messsages);
-
-			} else if(empty($mobile) && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)){
-
-			   $validator = Validator::make( array("email" => $email),['email' => 'required|email'],$messsages);
-
-			} else if(!empty($mobile) && is_numeric($mobile) && $mobile!='0000000000' && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)){
-
-				$validator = Validator::make( array("phone" => $mobile,"email" => $email),['phone' => 'required|digits:10','email' => 'required|email'],$messsages);
-
-			} else {
-
-				return Response::json(array(
-					'status' => 'error', 'code'  =>  422, 'message'   =>  'Invalid Input'
-				), 422);
-			}
-
-			if($validator->fails()){
-
-				return Response::json(array(
-					'status'    => 'error',
-					'code'      =>  422,
-					'message'   =>  $validator->messages()->first()
-				), 422);
-			}
-
-			$otp = mt_rand(100000,999999);
-			$phone_otp = $otp;
-			$cflag='';
-
-			$start = date( "Y-m-d 00:00:00");
-			$end = date( "Y-m-d 23:59:59");
-
-			if(empty($email) && !empty($mobile) && is_numeric($mobile) && $mobile!='0000000000'){
-                // dd(1);
-
-                $otpcnt = OtpTrack::where('phone', $mobile)->where('type','user')->whereBetween('created_at',[$start,$end])->count();
-
-                if($otpcnt >= 10){
-
-                    return Response::json(array(
-                            'status'    => 'error',
-                            'code'      =>  401,
-                            'message'   =>  'Your request limit exceeds'
-                        ), 401);
-                }
-			    $userverification = Userverification::where('phone', $mobile)->first();
-
-				$cflag='0';
-
-			} else if(empty($mobile) && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)){
-                // dd(2);
-
-				$otpcnt = OtpTrack::where('email', $email)->where('type','user')->whereBetween('created_at',[$start,$end])->count();
-
-                if($otpcnt >= 10){
-
-                    return Response::json(array(
-                            'status'    => 'error',
-                            'code'      =>  401,
-                            'message'   =>  'Your request limit exceeds'
-                        ), 401);
-                }
-
-                $userverification = Userverification::where('email', $email)->first();
-
-				$cflag='1';
-
-			} else if(!empty($mobile) && is_numeric($mobile) && $mobile!='0000000000' && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)){
-                // dd(3);
-				$otpcnt = OtpTrack::where('email', $email)->where('phone', $mobile)->where('type','user')->whereBetween('created_at',[$start,$end])->count();
-
-                if($otpcnt >= 10){
-
-                    return Response::json(array(
-                            'status'    => 'error',
-                            'code'      =>  401,
-                            'message'   =>  'Your request limit exceeds'
-                        ), 401);
-                }
-
-			    $userverification = Userverification::where('email', $email)->where('phone', $mobile)->first();
-
-				$cflag='3';
-			}
-
-            // dd("Done");
 
 			if(!empty($userverification)){
 

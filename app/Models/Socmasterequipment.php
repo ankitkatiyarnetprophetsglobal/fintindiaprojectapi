@@ -15,6 +15,7 @@ class Socmasterequipment extends Model
 	protected $fillable = [
         'id',
         'name',
+        'equipment_count',
         'status',
         'uname',
         'status',

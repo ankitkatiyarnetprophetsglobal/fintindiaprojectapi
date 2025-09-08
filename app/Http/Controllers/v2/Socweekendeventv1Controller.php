@@ -25,6 +25,7 @@ class Socweekendeventv1Controller extends Controller
 
     }
 
+
     public function save_datewise_soc_v1(Request $request){
 
 
@@ -144,12 +145,16 @@ class Socweekendeventv1Controller extends Controller
                                         where([
                                             ['soc_event_masters.id', '=', $socemid],
                                         ])
-                                        ->select('soc_event_masters.id','soc_event_masters.cycle','soc_event_masters.t_shirt','soc_event_masters.meal')
+                                        ->select('soc_event_masters.id','soc_event_masters.cycle','soc_event_masters.cycle_waiting','soc_event_masters.t_shirt','soc_event_masters.tshirt_waiting','soc_event_masters.meal','soc_event_masters.meal_waiting')
                                         ->first();
 
                 $master_cycle_count = $socevent_master_cycle['cycle'];
                 $master_tshirt_count = $socevent_master_cycle['t_shirt'];
                 $master_meal_count = $socevent_master_cycle['meal'];
+
+                $master_cycle_waiting_count = $socevent_master_cycle['cycle_waiting'];
+                $master_tshirt_waiting_count = $socevent_master_cycle['tshirt_waiting'];
+                $master_meal_waiting_count = $socevent_master_cycle['meal_waiting'];
 
                 if($cycle_check == 1){
                     if($master_cycle_count == 0){
@@ -190,8 +195,91 @@ class Socweekendeventv1Controller extends Controller
                         ), 200);
                     }
                 }
+                // open cycle waiting master capping
+                if($cycle_check == 1){
 
+                    $remaining_cycle_cal = Soceventparticipation::
+                                            where([
+                                                ['soc_event_participations.socemid', '=', $socemid],
+                                                ['soc_event_participations.cycle_waiting', 'like', "%Waiting id:-%"],
+                                            ])
+                                            ->select(DB::raw('count(soc_event_participations.cycle_waiting) as count_cycle_waiting'))
+                                            ->first();
 
+                    $cycle_waiting_count = $remaining_cycle_cal['count_cycle_waiting'];
+                    if((int)$cycle_waiting_count >= $master_cycle_waiting_count){
+
+                        $error_code = '801';
+                        $error_message = "Oops! This cycle slot is full";
+
+                        return Response::json(array(
+                            'isSuccess' => 'false',
+                            'code'      => $error_code,
+                            'data'      => null,
+                            'message'   => $error_message
+                        ), 200);
+
+                    }
+                }
+                // end cycle waiting master capping
+
+                // open cycle waiting master capping
+                if($t_shirt_check == 1){
+
+                    $remaining_cycle_cal = Soceventparticipation::
+                                            where([
+                                                ['soc_event_participations.socemid', '=', $socemid],
+                                                ['soc_event_participations.tshirt_waiting', 'like', "%Waiting id:-%"],
+                                            ])
+                                            ->select(DB::raw('count(soc_event_participations.tshirt_waiting) as count_tshirt_waiting'))
+                                            ->first();
+                    // dd($remaining_cycle_cal['count_tshirt_waiting']);
+                    $tshart_waiting_count = $remaining_cycle_cal['count_tshirt_waiting'];
+                    // dd($master_tshirt_waiting_count);
+                    if((int)$tshart_waiting_count >= $master_tshirt_waiting_count){
+
+                        $error_code = '801';
+                        $error_message = "Oops! This T-Shirt slot is full";
+
+                        return Response::json(array(
+                            'isSuccess' => 'false',
+                            'code'      => $error_code,
+                            'data'      => null,
+                            'message'   => $error_message
+                        ), 200);
+
+                    }
+                }
+                // end cycle waiting master capping
+
+                // open cycle waiting master capping
+                if($meal_check == 1){
+
+                    $remaining_cycle_cal = Soceventparticipation::
+                                            where([
+                                                ['soc_event_participations.socemid', '=', $socemid],
+                                                ['soc_event_participations.meal_waiting', 'like', "%Waiting id:-%"],
+                                            ])
+                                            ->select(DB::raw('count(soc_event_participations.meal_waiting) as count_meal_waiting'))
+                                            ->first();
+                    // dd($remaining_cycle_cal['count_tshirt_waiting']);
+                    $meal_waiting_count = $remaining_cycle_cal['count_meal_waiting'];
+                    // dd($master_tshirt_waiting_count);
+                    if((int)$meal_waiting_count >= $master_meal_waiting_count){
+
+                        $error_code = '801';
+                        $error_message = "Oops! This meal slot is full";
+
+                        return Response::json(array(
+                            'isSuccess' => 'false',
+                            'code'      => $error_code,
+                            'data'      => null,
+                            'message'   => $error_message
+                        ), 200);
+
+                    }
+                }
+                // end cycle waiting master capping
                 $user_taken_data = Soceventparticipation::
                                         where([
                                             ['soc_event_participations.socemid', '=', $socemid],
@@ -720,6 +808,704 @@ class Socweekendeventv1Controller extends Controller
             }
         }
     }
+
+
+
+    // public function copy_save_datewise_soc_v1(Request $request){
+
+
+    //     try{
+    //         $user = auth('api')->user();
+
+    //         if($user){
+
+    //             $socemid = $request->socemid;
+    //             $user_id = $request->user_id;
+    //             $uname = $request->uname;
+    //             $being_on_cycle_check_value = $being_on_cycle_check = $request->being_on_cycle_check;
+    //             $being_on_cycle_value = $being_on_cycle = $request->being_on_cycle;
+    //             $cycle_check = $request->cycle_check;
+    //             $cycle = $request->cycle;
+    //             $t_shirt = $request->t_shirt;
+    //             $t_shirt_check = $request->t_shirt_check;
+    //             $meal = $request->meal;
+    //             $meal_check = $request->meal_check;
+    //             $latitude = $request->latitude;
+    //             $longitude = $request->longitude;
+    //             $event_date = $request->event_date;
+
+    //             if($socemid == null || $socemid == ''){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Required soc event master id';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             if($user_id == null || $user_id == ''){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Required soc user id';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             if($uname == null || $uname == ''){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Required soc user name';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             if($cycle_check == 0 && $t_shirt_check == 0 && $meal_check == 0 && $being_on_cycle_check == 0){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Kindly select a Cycle before choosing your Refreshments.';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             if($latitude == null || $latitude == ''){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Required soc latitude';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             if($longitude == null || $longitude == ''){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Required soc longitude';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             if($event_date == null || $event_date == ''){
+
+    //                 $error_code = '801';
+    //                 $error_message = 'Required soc event date';
+
+    //                 return Response::json(array(
+    //                     'isSuccess' => 'false',
+    //                     'code'      => $error_code,
+    //                     'data'      => null,
+    //                     'message'   => $error_message
+    //                 ), 200);
+    //             }
+
+    //             // total avalablie
+    //             $socevent_master_cycle = Soceventmaster::
+    //                                     where([
+    //                                         ['soc_event_masters.id', '=', $socemid],
+    //                                     ])
+    //                                     ->select('soc_event_masters.id','soc_event_masters.cycle','soc_event_masters.t_shirt','soc_event_masters.meal')
+    //                                     ->first();
+
+    //             $master_cycle_count = $socevent_master_cycle['cycle'];
+    //             $master_tshirt_count = $socevent_master_cycle['t_shirt'];
+    //             $master_meal_count = $socevent_master_cycle['meal'];
+
+    //             if($cycle_check == 1){
+    //                 if($master_cycle_count == 0){
+    //                     $error_code = '801';
+    //                     $error_message = "Cycle booking is currently unavailable.";
+
+    //                     return Response::json(array(
+    //                         'isSuccess' => 'false',
+    //                         'code'      => $error_code,
+    //                         'data'      => null,
+    //                         'message'   => $error_message
+    //                     ), 200);
+    //                 }
+    //             }
+    //             if($t_shirt_check == 1){
+    //                 if($master_tshirt_count == 0){
+    //                     $error_code = '801';
+    //                     $error_message = "T-shirt booking is currently unavailable.";
+
+    //                     return Response::json(array(
+    //                         'isSuccess' => 'false',
+    //                         'code'      => $error_code,
+    //                         'data'      => null,
+    //                         'message'   => $error_message
+    //                     ), 200);
+    //                 }
+    //             }
+    //             if($meal_check == 1){
+    //                 if($master_meal_count == 0){
+    //                     $error_code = '801';
+    //                     $error_message = "Refreshments booking is currently unavailable.";
+
+    //                     return Response::json(array(
+    //                         'isSuccess' => 'false',
+    //                         'code'      => $error_code,
+    //                         'data'      => null,
+    //                         'message'   => $error_message
+    //                     ), 200);
+    //                 }
+    //             }
+
+
+    //             $user_taken_data = Soceventparticipation::
+    //                                     where([
+    //                                         ['soc_event_participations.socemid', '=', $socemid],
+    //                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                     ])
+    //                                     ->select(
+    //                                         'soc_event_participations.id',
+    //                                         'soc_event_participations.user_id',
+    //                                         'soc_event_participations.being_on_cycle_check',
+    //                                         'soc_event_participations.being_on_cycle',
+    //                                         'soc_event_participations.cycle',
+    //                                         'soc_event_participations.cycle_booking',
+    //                                         'soc_event_participations.cycle_waiting',
+    //                                         'soc_event_participations.t_shirt',
+    //                                         'soc_event_participations.tshart_booking',
+    //                                         'soc_event_participations.tshirt_waiting',
+    //                                         'soc_event_participations.meal',
+    //                                         'soc_event_participations.meal_booking',
+    //                                         'soc_event_participations.meal_waiting'
+    //                                         )
+    //                                     ->first();
+
+    //                     if(isset($user_taken_data)){
+
+
+    //                         $id = $user_taken_data['id'];
+
+    //                         $user_takesn_cycle_count = Soceventparticipation::
+    //                                         where([
+    //                                             ['soc_event_participations.socemid', '=', $socemid],
+    //                                         ])
+    //                                         ->select(
+    //                                             DB::raw('CAST(IFNULL(SUM(soc_event_participations.cycle), 0) AS SIGNED) AS remaining_cycle'),
+    //                                             DB::raw('CAST(IFNULL(SUM(soc_event_participations.t_shirt), 0) AS SIGNED) AS remaining_tshirt'),
+    //                                             DB::raw('CAST(IFNULL(SUM(soc_event_participations.meal), 0) AS SIGNED) AS remaining_meal'),
+    //                                             )
+    //                                         ->first();
+
+    //                         $remaining_cycle = $user_takesn_cycle_count['remaining_cycle'];
+    //                         $remaining_tshirt = $user_takesn_cycle_count['remaining_tshirt'];
+    //                         $remaining_meal = $user_takesn_cycle_count['remaining_meal'];
+    //                         // calculate remaining
+    //                         $total_cycle_available = ($master_cycle_count - $remaining_cycle);
+    //                         $total_tshart_available = ($master_tshirt_count - $remaining_tshirt);
+    //                         $total_meal_available = ($master_meal_count - $remaining_meal);
+
+    //                         if($being_on_cycle_check == 1){
+
+    //                             $being_on_cycle_check = $user_taken_data['being_on_cycle_check'];
+    //                             $being_on_cycle = $user_taken_data['being_on_cycle'];
+
+    //                             if(isset($being_on_cycle_check) || isset($being_on_cycle)){
+
+    //                                 $error_code = '801';
+    //                                 $error_message = "Cycle booked! See you this Sunday.";
+
+    //                                 return Response::json(array(
+    //                                     'isSuccess' => 'false',
+    //                                     'code'      => $error_code,
+    //                                     'data'      => null,
+    //                                     'message'   => $error_message
+    //                                 ), 200);
+    //                             }
+
+    //                         }
+    //                         // dd(27);
+
+    //                         if($being_on_cycle_check_value == 1 && $being_on_cycle_value == 1){
+    //                             // dd(27);
+    //                             Soceventparticipation::where([
+    //                                                         ['soc_event_participations.id', '=', $id],
+    //                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                         ['soc_event_participations.status', '=', 1],
+    //                                                     ])
+    //                                                     ->update(
+    //                                                         [
+    //                                                             'soc_event_participations.cycle_booking' => null,
+    //                                                             'soc_event_participations.cycle' => null
+    //                                                         ]
+    //                                                     );
+
+    //                             Soceventparticipation::where([
+    //                                                         ['soc_event_participations.id', '=', $id],
+    //                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                         ['soc_event_participations.status', '=', 1],
+    //                                                     ])
+    //                                                     ->update(
+    //                                                         [
+    //                                                             'soc_event_participations.being_on_cycle_check' => 1,
+    //                                                             'soc_event_participations.being_on_cycle' => 1
+    //                                                         ]
+    //                                                     );
+
+    //                         }
+
+    //                         // update cycle
+    //                         if($cycle_check == 1){
+
+    //                             $taken_cycle_booking = $user_taken_data['cycle_booking'];
+    //                             $taken_cycle_waiting = $user_taken_data['cycle_waiting'];
+
+
+    //                             if(isset($taken_cycle_booking) || isset($taken_cycle_waiting)){
+
+    //                                 $error_code = '801';
+    //                                 $error_message = "Your cycle is already booked";
+
+    //                                 return Response::json(array(
+    //                                     'isSuccess' => 'false',
+    //                                     'code'      => $error_code,
+    //                                     'data'      => null,
+    //                                     'message'   => $error_message
+    //                                 ), 200);
+    //                             }
+
+
+    //                             if(!isset($taken_cycle_booking) && !isset($taken_cycle_waiting)){
+    //                                 // dd("Bring your own cycle");
+    //                                 if($total_cycle_available > 0){
+
+    //                                     if(!isset($being_on_cycle)){
+
+    //                                         Soceventparticipation::where([
+    //                                                         ['soc_event_participations.id', '=', $id],
+    //                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                         ['soc_event_participations.status', '=', 1],
+    //                                                     ])
+    //                                                     ->update(
+    //                                                         [
+    //                                                             'soc_event_participations.being_on_cycle_check' => null,
+    //                                                             'soc_event_participations.being_on_cycle' => null
+    //                                                         ]
+    //                                                     );
+    //                                     }
+
+    //                                     // dd("Done");
+    //                                     if(!isset($user_taken_data['cycle'])){
+
+    //                                         $booking_id_no = ($remaining_cycle + 1);
+
+    //                                         $cycle_booking = "Booking Id:- ".$booking_id_no;
+
+    //                                         Soceventparticipation::where([
+    //                                                         ['soc_event_participations.id', '=', $id],
+    //                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                         ['soc_event_participations.status', '=', 1],
+    //                                                     ])
+    //                                                     ->update(
+    //                                                         [
+    //                                                             'soc_event_participations.cycle_booking' => $cycle_booking,
+    //                                                             'soc_event_participations.cycle' => $cycle
+    //                                                         ]
+    //                                                     );
+
+    //                                     }
+
+    //                                 }
+
+    //                                 if($total_cycle_available == 0){
+
+    //                                     $remaining_cycle_cal = Soceventparticipation::
+    //                                                     where([
+    //                                                         ['soc_event_participations.socemid', '=', $socemid],
+    //                                                         ['soc_event_participations.cycle_waiting', 'like', "%Waiting id:-%"],
+    //                                                     ])
+    //                                                     ->select(DB::raw('count(soc_event_participations.cycle_waiting) as count_cycle_waiting'))
+    //                                                     ->first();
+
+    //                                     $remaining_cycle_cal_wat = $remaining_cycle_cal['count_cycle_waiting'] + 1;
+
+    //                                     $cycle_waiting = "Waiting id:- ".$remaining_cycle_cal_wat;
+
+    //                                     Soceventparticipation::where([
+    //                                                                 ['soc_event_participations.id', '=', $id],
+    //                                                                 ['soc_event_participations.user_id', '=', $user_id],
+    //                                                                 ['soc_event_participations.status', '=', 1],
+    //                                                             ])
+    //                                                             ->update(
+    //                                                                 [
+    //                                                                     'soc_event_participations.cycle_waiting' => $cycle_waiting,
+    //                                                                     'soc_event_participations.cycle' => null
+    //                                                                 ]
+    //                                                             );
+    //                                 }
+    //                             }
+    //                         }
+    //                         // update tshart
+    //                         if($t_shirt_check == 1){
+
+    //                             $taken_tshart_booking = $user_taken_data['tshart_booking'];
+    //                             $taken_tshirt_waiting = $user_taken_data['tshirt_waiting'];
+
+
+    //                             if(isset($taken_tshart_booking) || isset($taken_tshirt_waiting)){
+
+    //                                 $error_code = '801';
+    //                                 $error_message = "Your T-Shirt is already booked";
+
+    //                                 return Response::json(array(
+    //                                     'isSuccess' => 'false',
+    //                                     'code'      => $error_code,
+    //                                     'data'      => null,
+    //                                     'message'   => $error_message
+    //                                 ), 200);
+    //                             }
+
+    //                             if(!isset($taken_tshart_booking) && !isset($taken_tshirt_waiting)){
+
+    //                                 if($total_tshart_available > 0){
+
+    //                                     if(!isset($user_taken_data['t_shirt'])){
+
+    //                                         $booking_tshart_id_no = ($remaining_tshirt +1);
+    //                                         $tshart_booking = "Booking Id:- ". $booking_tshart_id_no;
+
+    //                                         Soceventparticipation::where([
+    //                                                         ['soc_event_participations.id', '=', $id],
+    //                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                         ['soc_event_participations.status', '=', 1],
+    //                                                     ])
+    //                                                     ->update(
+    //                                                         [
+    //                                                             'soc_event_participations.tshart_booking' => $tshart_booking,
+    //                                                             'soc_event_participations.t_shirt' => $t_shirt
+    //                                                         ]
+    //                                                     );
+    //                                     }
+    //                                 }
+
+    //                                 if($total_tshart_available == 0){
+
+    //                                     if(!isset($user_taken_data['tshart_booking'])){
+
+    //                                         $remaining_tshirt_cal = Soceventparticipation::
+    //                                                             where([
+    //                                                                 ['soc_event_participations.socemid', '=', $socemid],
+    //                                                                 ['soc_event_participations.tshirt_waiting', 'like', "%Waiting id:-%"],
+    //                                                             ])
+    //                                                             ->select(DB::raw('count(soc_event_participations.tshirt_waiting) as count_tshirt_waiting'))
+    //                                                             ->first();
+
+    //                                         $remaining_tshirt_cal = $remaining_tshirt_cal['count_tshirt_waiting'] + 1;
+    //                                         $tshirt_waiting = "Waiting id:- ".$remaining_tshirt_cal;
+
+    //                                         Soceventparticipation::where([
+    //                                                     ['soc_event_participations.id', '=', $id],
+    //                                                     ['soc_event_participations.user_id', '=', $user_id],
+    //                                                     ['soc_event_participations.status', '=', 1],
+    //                                                 ])
+    //                                                 ->update(
+    //                                                     [
+    //                                                         'soc_event_participations.tshirt_waiting' => $tshirt_waiting,
+    //                                                         'soc_event_participations.t_shirt' => null
+    //                                                     ]
+    //                                                 );
+    //                                     }
+
+    //                                 }
+    //                             }
+    //                         }
+    //                         // insert meal
+    //                         if($meal_check == 1){
+
+
+    //                             $taken_meal_booking = $user_taken_data['meal_booking'];
+    //                             $taken_meal_waiting = $user_taken_data['meal_waiting'];
+
+    //                             if(isset($taken_meal_booking) || isset($taken_meal_waiting)){
+
+    //                                 $error_code = '801';
+    //                                 $error_message = "Your Refreshment is already booked";
+
+    //                                 return Response::json(array(
+    //                                     'isSuccess' => 'false',
+    //                                     'code'      => $error_code,
+    //                                     'data'      => null,
+    //                                     'message'   => $error_message
+    //                                 ), 200);
+    //                             }
+
+    //                             if(!isset($taken_meal_booking) && !isset($taken_meal_waiting)){
+
+    //                                 if($total_meal_available > 0){
+
+    //                                     if(!isset($user_taken_data['meal'])){
+
+    //                                         $booking_meal_no = ($remaining_meal +1);
+    //                                         $meal_booking = "Booking Id:- ". $booking_meal_no;
+
+    //                                         Soceventparticipation::where([
+    //                                                         ['soc_event_participations.id', '=', $id],
+    //                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                         ['soc_event_participations.status', '=', 1],
+    //                                                     ])
+    //                                                     ->update(
+    //                                                         [
+    //                                                             'soc_event_participations.meal_booking' => $meal_booking,
+    //                                                             'soc_event_participations.meal' => $meal
+    //                                                         ]
+    //                                                     );
+    //                                     }
+    //                                 }
+
+    //                                 if($total_meal_available == 0){
+
+    //                                     if(!isset($user_taken_data['meal_booking'])){
+
+    //                                         $remaining_meal_cal = Soceventparticipation::
+    //                                                             where([
+    //                                                                 ['soc_event_participations.socemid', '=', $socemid],
+    //                                                                 ['soc_event_participations.meal_waiting', 'like', "%Waiting id:-%"],
+    //                                                             ])
+    //                                                             ->select(DB::raw('count(soc_event_participations.meal_waiting) as count_meal_waiting'))
+    //                                                             ->first();
+    //                                         $remaining_meal_cal_wat = $remaining_meal_cal['count_meal_waiting'] + 1;
+    //                                         $meal_waiting = "Waiting id:- ".$remaining_meal_cal_wat;
+
+    //                                         Soceventparticipation::where([
+    //                                                                         ['soc_event_participations.id', '=', $id],
+    //                                                                         ['soc_event_participations.user_id', '=', $user_id],
+    //                                                                         ['soc_event_participations.status', '=', 1],
+    //                                                                     ])
+    //                                                                     ->update(
+    //                                                                         [
+    //                                                                             'soc_event_participations.meal_waiting' => $meal_waiting,
+    //                                                                             'soc_event_participations.meal' => null
+    //                                                                         ]
+    //                                                                     );
+
+    //                                     }
+
+    //                                 }
+    //                             }
+    //                         }
+    //                     }else{
+
+
+    //                         $user_takesn_cycle_count = Soceventparticipation::
+    //                                         where([
+    //                                             ['soc_event_participations.socemid', '=', $socemid],
+    //                                         ])
+    //                                         ->select(
+    //                                             DB::raw('CAST(IFNULL(SUM(soc_event_participations.cycle), 0) AS SIGNED) AS remaining_cycle'),
+    //                                             DB::raw('CAST(IFNULL(SUM(soc_event_participations.t_shirt), 0) AS SIGNED) AS remaining_tshirt'),
+    //                                             DB::raw('CAST(IFNULL(SUM(soc_event_participations.meal), 0) AS SIGNED) AS remaining_meal'),
+    //                                             // DB::raw('CAST(IFNULL(sum(soc_event_participations.cycle), 0) as int) as remaining_cycle'),
+    //                                             // DB::raw('CAST(IFNULL(sum(soc_event_participations.t_shirt), 0) as int) as remaining_tshirt'),
+    //                                             // DB::raw('CAST(IFNULL(sum(soc_event_participations.meal), 0) as int) as remaining_meal'),
+    //                                             )
+    //                                         ->first();
+
+    //                         $remaining_cycle = $user_takesn_cycle_count['remaining_cycle'];
+    //                         $remaining_tshirt = $user_takesn_cycle_count['remaining_tshirt'];
+    //                         $remaining_meal = $user_takesn_cycle_count['remaining_meal'];
+    //                         // calculate remaining
+    //                         $total_cycle_available = ($master_cycle_count - $remaining_cycle);
+    //                         $total_tshart_available = ($master_tshirt_count - $remaining_tshirt);
+    //                         $total_meal_available = ($master_meal_count - $remaining_meal);
+
+    //                         // insert cycle
+    //                         if($cycle_check == 1){
+
+    //                             if($total_cycle_available > 0){
+
+    //                                 $booking_id_no = ($remaining_cycle + 1);
+    //                                 $cycle_booking = "Booking Id:- ".$booking_id_no;
+
+    //                             }
+    //                             if($total_cycle_available == 0){
+
+    //                                 $remaining_cycle_cal = Soceventparticipation::
+    //                                                     where([
+    //                                                         ['soc_event_participations.socemid', '=', $socemid],
+    //                                                         ['soc_event_participations.cycle_waiting', 'like', "%Waiting id:-%"],
+    //                                                     ])
+    //                                                     ->select(DB::raw('count(soc_event_participations.cycle_waiting) as count_cycle_waiting'))
+    //                                                     ->first();
+
+    //                                 $remaining_cycle_cal_wat = $remaining_cycle_cal['count_cycle_waiting'] + 1;
+
+    //                                 $cycle_waiting = "Waiting id:- ".$remaining_cycle_cal_wat;
+
+    //                             }
+    //                         }
+    //                         // insert tshart
+    //                         if($t_shirt_check == 1){
+    //                             if($total_tshart_available > 0){
+
+    //                                 $booking_tshart_id_no = ($remaining_tshirt +1);
+    //                                 $tshart_booking = "Booking Id:- ". $booking_tshart_id_no;
+    //                             }
+    //                             if($total_tshart_available == 0){
+
+    //                                 $remaining_tshirt_cal = Soceventparticipation::
+    //                                                     where([
+    //                                                         ['soc_event_participations.socemid', '=', $socemid],
+    //                                                         ['soc_event_participations.tshirt_waiting', 'like', "%Waiting id:-%"],
+    //                                                     ])
+    //                                                     ->select(DB::raw('count(soc_event_participations.tshirt_waiting) as count_tshirt_waiting'))
+    //                                                     ->first();
+
+    //                                 $remaining_tshirt_cal = $remaining_tshirt_cal['count_tshirt_waiting'] + 1;
+    //                                 $tshirt_waiting = "Waiting id:- ".$remaining_tshirt_cal;
+
+    //                             }
+    //                         }
+    //                         // insert meal
+    //                         if($meal_check == 1){
+    //                             if($total_meal_available > 0){
+
+    //                                 $booking_meal_no = ($remaining_meal +1);
+    //                                 $meal_booking = "Booking Id:- ". $booking_meal_no;
+
+    //                             }
+    //                             if($total_meal_available == 0){
+
+    //                                 $remaining_meal_cal = Soceventparticipation::
+    //                                                     where([
+    //                                                         ['soc_event_participations.socemid', '=', $socemid],
+    //                                                         ['soc_event_participations.meal_waiting', 'like', "%Waiting id:-%"],
+    //                                                     ])
+    //                                                     ->select(DB::raw('count(soc_event_participations.meal_waiting) as count_meal_waiting'))
+    //                                                     ->first();
+    //                                 $remaining_meal_cal_wat = $remaining_meal_cal['count_meal_waiting'] + 1;
+    //                                 $meal_waiting = "Waiting id:- ".$remaining_meal_cal_wat;
+
+    //                             }
+    //                         }
+    //                         // Save Data
+    //                         $datastore = new Soceventparticipation();
+    //                         $datastore->socemid = $socemid;
+    //                         $datastore->user_id = $user_id;
+    //                         $datastore->uname = $uname;
+
+    //                         if($being_on_cycle_check == 1){
+
+    //                             $datastore->being_on_cycle_check = $being_on_cycle_check;
+    //                             $datastore->being_on_cycle = $being_on_cycle;
+
+    //                         }
+
+    //                         if($cycle_check == 1){
+
+    //                             if(isset($cycle_waiting)){
+
+    //                                 $datastore->cycle_waiting = $cycle_waiting;
+    //                                 $datastore->cycle = null;
+    //                             }else{
+
+    //                                 $datastore->cycle = $cycle;
+    //                                 $datastore->cycle_booking = $cycle_booking;
+    //                             }
+    //                         }
+
+    //                         if($t_shirt_check == 1){
+
+    //                             if(isset($tshirt_waiting)){
+
+    //                                 $datastore->tshirt_waiting = $tshirt_waiting;
+    //                                 $datastore->t_shirt = null;
+
+    //                             }else{
+    //                                 $datastore->t_shirt = $t_shirt;
+    //                                 $datastore->tshart_booking = $tshart_booking;
+
+    //                             }
+    //                         }
+    //                         if($meal_check == 1){
+
+    //                             if(isset($meal_waiting)){
+
+    //                                 $datastore->meal_waiting = $meal_waiting;
+    //                                 $datastore->meal = null;
+
+    //                             }else{
+
+    //                                 $datastore->meal = $meal;
+    //                                 $datastore->meal_booking = $meal_booking;
+    //                             }
+    //                         }
+
+    //                         $datastore->latitude = $latitude;
+    //                         $datastore->longitude = $longitude;
+    //                         $datastore->event_date = $event_date;
+    //                         $datastore->status = 1;
+    //                         $datastore->save();
+    //                     }
+
+    //             return Response::json(array(
+    //                 'isSuccess' => 'true',
+    //                 // 'message_show' =>  'You get tshirt',
+    //                 // 'successm' => $success_message,
+    //                 'code'      => 200,
+    //                 'data'      => null,
+    //                 'message'   => 'You’ve successfully registered for FIT India Sundays on Cycle.'
+    //             ), 200);
+
+    //         }else{
+
+    //             return Response::json(array(
+    //                 'status'    => 'error',
+    //                 'code'      =>  801,
+    //                 'message'   =>  'Unauthorized'
+    //             ), 401);
+
+    //         }
+
+    //     } catch(Exception $e) {
+
+    //         $controller_name = 'Socweekendeventv1Controller';
+    //         $function_name = 'save_datewise_soc';
+    //         $error_code = '901';
+    //         $error_message = $e->getMessage();
+    //         $send_payload = json_encode($request->all());
+    //         $response = null;
+
+    //         $result = (new CommonController)->error_log($function_name,$controller_name,$error_code,$error_message,$send_payload,$response);
+
+    //         if(empty($e)){
+    //             return Response::json(array(
+    //                 'isSuccess' => 'false',
+    //                 'code'      => $error_code,
+    //                 'data'      => null,
+    //                 'message'   => $error_message
+    //             ), 200);
+    //         }
+    //     }
+    // }
 
     public function save_datewise_receive_soc_v1(Request $request){
 
